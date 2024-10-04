@@ -1,5 +1,6 @@
 package com.ufrn.imd.divide.ai.exception;
 
+import com.ufrn.imd.divide.ai.dto.response.ErrorResponseDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -16,9 +17,9 @@ public class ControllerExceptionHandler {
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ErrorResponse handleResourceNotFoundException(
+    public ErrorResponseDTO handleResourceNotFoundException(
             ResourceNotFoundException exception, WebRequest request) {
-        return new ErrorResponse(
+        return new ErrorResponseDTO(
                 ZonedDateTime.now(),
                 HttpStatus.NOT_FOUND.value(),
                 HttpStatus.NOT_FOUND.getReasonPhrase(),
@@ -28,10 +29,10 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleBusinessException(
+    public ErrorResponseDTO handleBusinessException(
                 BusinessException exception, WebRequest request) {
 
-        return new ErrorResponse(
+        return new ErrorResponseDTO(
                 ZonedDateTime.now(),
                 exception.getHttpStatusCode().value(),
                 "Business error",
@@ -41,10 +42,10 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
     @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
-    public ErrorResponse handleBadCredentialsException(
+    public ErrorResponseDTO handleBadCredentialsException(
             BadCredentialsException exception, WebRequest request) {
 
-        return new ErrorResponse(
+        return new ErrorResponseDTO(
                 ZonedDateTime.now(),
                 HttpStatus.UNAUTHORIZED.value(),
                 HttpStatus.UNAUTHORIZED.getReasonPhrase(),
@@ -54,7 +55,7 @@ public class ControllerExceptionHandler {
 
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ErrorResponse handleMethodArgumentNotValidException(
+    public ErrorResponseDTO handleMethodArgumentNotValidException(
             MethodArgumentNotValidException exception, WebRequest request) {
         String errors = exception.getBindingResult()
                 .getFieldErrors()
@@ -62,7 +63,7 @@ public class ControllerExceptionHandler {
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .collect(Collectors.joining(", "));
 
-        return new ErrorResponse(
+        return new ErrorResponseDTO(
                 ZonedDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
@@ -73,8 +74,8 @@ public class ControllerExceptionHandler {
 
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
-    public ErrorResponse handleException(Exception exception, WebRequest request) {
-        return new ErrorResponse(
+    public ErrorResponseDTO handleException(Exception exception, WebRequest request) {
+        return new ErrorResponseDTO(
                 ZonedDateTime.now(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),

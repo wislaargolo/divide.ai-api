@@ -1,8 +1,8 @@
-package com.ufrn.imd.divide.ai.exception;
+package com.ufrn.imd.divide.ai.dto.response;
 
 import java.time.ZonedDateTime;
 
-public record ErrorResponse(
+public record ErrorResponseDTO(
         ZonedDateTime timestamp,
         Integer status,
         String error,
