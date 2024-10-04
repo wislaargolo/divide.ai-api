@@ -32,14 +32,4 @@ public class UserController {
         );
     }
 
-    @GetMapping
-    public ApiResponseDTO<UserResponseDTO> get(){
-        return new ApiResponseDTO<>(
-                true,
-                "Sucess: User created successfully.",
-                null,
-                null
-        );
-    }
-
 }
