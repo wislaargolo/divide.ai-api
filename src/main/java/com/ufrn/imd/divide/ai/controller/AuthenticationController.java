@@ -4,6 +4,7 @@ import com.ufrn.imd.divide.ai.dto.request.AuthRequestDTO;
 import com.ufrn.imd.divide.ai.dto.response.ApiResponseDTO;
 import com.ufrn.imd.divide.ai.dto.response.AuthResponseDTO;
 import com.ufrn.imd.divide.ai.service.AuthenticationService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,12 +22,11 @@ public class AuthenticationController {
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<ApiResponseDTO<AuthResponseDTO>> authenticate(@RequestBody AuthRequestDTO request) {
-        return ResponseEntity.ok(
-                new ApiResponseDTO<>(
+    public ApiResponseDTO<AuthResponseDTO> authenticate(@RequestBody @Valid AuthRequestDTO request) {
+        return new ApiResponseDTO<>(
                         true,
                         "Authentication completed successfully",
                         authenticationService.authenticate(request),
-                        null));
+                        null);
     }
 }

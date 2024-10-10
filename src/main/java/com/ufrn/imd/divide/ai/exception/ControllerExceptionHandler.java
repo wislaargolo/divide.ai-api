@@ -27,8 +27,8 @@ public class ControllerExceptionHandler {
                 request.getDescription(false));
     }
 
-    @ExceptionHandler(BusinessException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BusinessException.class)
     public ErrorResponseDTO handleBusinessException(
                 BusinessException exception, WebRequest request) {
 
@@ -40,8 +40,8 @@ public class ControllerExceptionHandler {
                 request.getDescription(false));
     }
 
-    @ExceptionHandler(BadCredentialsException.class)
     @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(BadCredentialsException.class)
     public ErrorResponseDTO handleBadCredentialsException(
             BadCredentialsException exception, WebRequest request) {
 
