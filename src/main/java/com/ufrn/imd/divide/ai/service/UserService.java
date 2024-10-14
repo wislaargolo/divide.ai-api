@@ -32,7 +32,7 @@ public class UserService {
     }
 
 
-    @Transactional
+
     public void delete(Long userId) {
         if (userRepository.existsById(userId)) {
             userRepository.deleteById(userId);
@@ -52,7 +52,7 @@ public class UserService {
         return userMapper.toDto(userRepository.save(user));
     }
 
-    @Transactional
+
     public UserResponseDTO save(UserRequestDTO dto){
         User entity = userMapper.toEntity(dto);
 
