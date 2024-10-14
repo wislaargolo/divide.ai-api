@@ -40,7 +40,7 @@ public class UserController {
 
         return new ApiResponseDTO<>(
                 true,
-                "Sucess: User updated successfully.",
+                "User updated successfully.",
                 userService.update(dto, userId),
                 null
         );
@@ -54,7 +54,7 @@ public class UserController {
 
         return new ApiResponseDTO<>(
                 true,
-                "Sucess: User created successfully.",
+                "User created successfully.",
                  userService.save(dto),
                 null
         );

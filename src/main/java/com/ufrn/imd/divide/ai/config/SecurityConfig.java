@@ -1,8 +1,8 @@
 package com.ufrn.imd.divide.ai.config;
 
+import com.ufrn.imd.divide.ai.exception.CustomAuthenticationEntryPoint;
 import com.ufrn.imd.divide.ai.filter.JwtAuthenticationFilter;
 import com.ufrn.imd.divide.ai.service.UserDetailsServiceImpl;
-import com.ufrn.imd.divide.ai.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,25 +22,28 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserDetailsServiceImpl userDetailsServiceImpl;
-
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     public SecurityConfig(UserDetailsServiceImpl userDetailsServiceImpl,
-                          JwtAuthenticationFilter jwtAuthenticationFilter) {
+                          JwtAuthenticationFilter jwtAuthenticationFilter,
+                          CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
         this.userDetailsServiceImpl = userDetailsServiceImpl;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
-
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(
-                        req -> req.requestMatchers("/auth/authenticate", "/users/register")
-                                .permitAll()
-                                .anyRequest()
-                                .authenticated()
-                ).userDetailsService(userDetailsServiceImpl)
+                .authorizeHttpRequests(req -> req
+                        .requestMatchers("/auth/authenticate", "/users/register").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                )
+                .userDetailsService(userDetailsServiceImpl)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
@@ -55,6 +58,4 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception{
         return configuration.getAuthenticationManager();
     }
-
-
 }

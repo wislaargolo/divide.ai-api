@@ -1,12 +1,18 @@
 package com.ufrn.imd.divide.ai.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
+import java.io.Serializable;
 
 @Entity
 @Table(name = "categories")
-public class Category extends BaseEntity {
+public class Category implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long id;
 
     @Column(nullable = false)
     private String name;
@@ -17,6 +23,13 @@ public class Category extends BaseEntity {
     @Column
     private String color;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;

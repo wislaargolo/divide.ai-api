@@ -1,19 +1,18 @@
 package com.ufrn.imd.divide.ai.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
+import jakarta.persistence.*;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.List;
+
 
 @Entity
 @Table(name = "users")
-public class User extends BaseEntity {
+public class User implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long id;
 
     @Column(nullable = false)
     private String firstName;
@@ -29,6 +28,14 @@ public class User extends BaseEntity {
 
     @Column(nullable = false, unique = true)
     private String phoneNumber;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getFirstName() {
         return firstName;
