@@ -17,6 +17,12 @@ public class CategoryService {
     }
 
     public Category saveCategory(Category category) {
+        List<Category> existingCategory = categoryRepository.findByName(category.getName());
+
+        if (!existingCategory.isEmpty()) {
+            throw new Error("Categoria com o nome '" + category.getName() + "' já existe.");
+        }
+
         return categoryRepository.save(category);
     }
 
@@ -37,7 +43,7 @@ public class CategoryService {
         });
     }
 
-    public Optional<Category> getCategoryByName(String name) {
+    public List<Category> getCategoryByName(String name) {
         return categoryRepository.findByName(name);
     }
 
