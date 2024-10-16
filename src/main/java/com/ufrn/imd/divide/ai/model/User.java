@@ -1,6 +1,8 @@
 package com.ufrn.imd.divide.ai.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Where;
+
 import java.io.Serializable;
 
 
@@ -20,14 +22,16 @@ public class User implements Serializable {
     @Column(nullable = false)
     private String lastName;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String email;
 
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String phoneNumber;
+
+    private boolean active;
 
     public Long getId() {
         return id;
@@ -75,5 +79,13 @@ public class User implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

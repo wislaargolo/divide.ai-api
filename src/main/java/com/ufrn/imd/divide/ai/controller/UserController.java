@@ -8,6 +8,7 @@ import com.ufrn.imd.divide.ai.util.validation.OnCreate;
 import jakarta.validation.Valid;
 import jakarta.validation.groups.Default;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,41 +24,43 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    public ApiResponseDTO<?> delete(@PathVariable Long userId) {
+    public ResponseEntity<ApiResponseDTO<?>> delete(@PathVariable Long userId) {
         userService.delete(userId);
-        return new ApiResponseDTO<>(
+        ApiResponseDTO<?> response = new ApiResponseDTO<>(
                 true,
                 "User deleted successfully",
                 null,
                 null
         );
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{userId}")
-    public ApiResponseDTO<UserResponseDTO> update(
+    public ResponseEntity<ApiResponseDTO<UserResponseDTO>> update(
             @PathVariable Long userId,
             @RequestBody @Valid UserRequestDTO dto) {
 
-        return new ApiResponseDTO<>(
+        ApiResponseDTO<UserResponseDTO> response = new ApiResponseDTO<>(
                 true,
                 "User updated successfully.",
                 userService.update(dto, userId),
                 null
         );
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/register")
-    @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponseDTO<UserResponseDTO> save(
+    public ResponseEntity<ApiResponseDTO<UserResponseDTO>> save(
             @Validated({Default.class, OnCreate.class})
             @RequestBody UserRequestDTO dto){
 
-        return new ApiResponseDTO<>(
+        ApiResponseDTO<UserResponseDTO> response = new ApiResponseDTO<>(
                 true,
                 "User created successfully.",
-                 userService.save(dto),
+                userService.save(dto),
                 null
         );
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
 }

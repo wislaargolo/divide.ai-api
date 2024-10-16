@@ -3,6 +3,7 @@ package com.ufrn.imd.divide.ai.exception;
 import com.ufrn.imd.divide.ai.dto.response.ApiResponseDTO;
 import com.ufrn.imd.divide.ai.dto.response.ErrorResponseDTO;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,9 +18,8 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class ControllerExceptionHandler {
 
-    @ResponseStatus(value = HttpStatus.NOT_FOUND)
     @ExceptionHandler({ResourceNotFoundException.class, NoResourceFoundException.class})
-    public ApiResponseDTO<ErrorResponseDTO> handleResourceNotFoundException(
+    public ResponseEntity<ApiResponseDTO<ErrorResponseDTO>> handleResourceNotFoundException(
             Exception exception, WebRequest request) {
 
         ErrorResponseDTO errorResponse = new ErrorResponseDTO(
@@ -29,17 +29,18 @@ public class ControllerExceptionHandler {
                 exception.getMessage(),
                 request.getDescription(false));
 
-        return new ApiResponseDTO<>(
+        ApiResponseDTO<ErrorResponseDTO> response = new ApiResponseDTO<>(
                 false,
                 "Resource not found",
                 null,
                 errorResponse
         );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BusinessException.class)
-    public ApiResponseDTO<ErrorResponseDTO> handleBusinessException(
+    public ResponseEntity<ApiResponseDTO<ErrorResponseDTO>> handleBusinessException(
             BusinessException exception, WebRequest request) {
 
         ErrorResponseDTO errorResponse = new ErrorResponseDTO(
@@ -49,17 +50,18 @@ public class ControllerExceptionHandler {
                 exception.getMessage(),
                 request.getDescription(false));
 
-        return new ApiResponseDTO<>(
+        ApiResponseDTO<ErrorResponseDTO> response = new ApiResponseDTO<>(
                 false,
                 "Business validation failed",
                 null,
                 errorResponse
         );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
-    @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(BadCredentialsException.class)
-    public ApiResponseDTO<ErrorResponseDTO> handleBadCredentialsException(
+    public ResponseEntity<ApiResponseDTO<ErrorResponseDTO>> handleBadCredentialsException(
             BadCredentialsException exception, WebRequest request) {
 
         ErrorResponseDTO errorResponse = new ErrorResponseDTO(
@@ -69,17 +71,18 @@ public class ControllerExceptionHandler {
                 exception.getMessage(),
                 request.getDescription(false));
 
-        return new ApiResponseDTO<>(
+        ApiResponseDTO<ErrorResponseDTO> response = new ApiResponseDTO<>(
                 false,
                 "Invalid credentials",
                 null,
                 errorResponse
         );
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ApiResponseDTO<ErrorResponseDTO> handleMethodArgumentNotValidException(
+    public ResponseEntity<ApiResponseDTO<ErrorResponseDTO>> handleMethodArgumentNotValidException(
             MethodArgumentNotValidException exception, WebRequest request) {
         String errors = exception.getBindingResult()
                 .getFieldErrors()
@@ -94,17 +97,18 @@ public class ControllerExceptionHandler {
                 errors,
                 request.getDescription(false));
 
-        return new ApiResponseDTO<>(
+        ApiResponseDTO<ErrorResponseDTO> response = new ApiResponseDTO<>(
                 false,
                 "Validation error",
                 null,
                 errorResponse
         );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
-    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
-    public ApiResponseDTO<ErrorResponseDTO> handleException(Exception exception, WebRequest request) {
+    public ResponseEntity<ApiResponseDTO<ErrorResponseDTO>> handleException(Exception exception, WebRequest request) {
         ErrorResponseDTO errorResponse = new ErrorResponseDTO(
                 ZonedDateTime.now(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
@@ -112,11 +116,14 @@ public class ControllerExceptionHandler {
                 exception.getMessage(),
                 request.getDescription(false));
 
-        return new ApiResponseDTO<>(
+        ApiResponseDTO<ErrorResponseDTO> response = new ApiResponseDTO<>(
                 false,
                 "Internal server error",
                 null,
                 errorResponse
         );
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 }
+

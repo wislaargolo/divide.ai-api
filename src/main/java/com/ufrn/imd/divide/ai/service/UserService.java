@@ -8,7 +8,6 @@ import com.ufrn.imd.divide.ai.model.User;
 import com.ufrn.imd.divide.ai.repository.UserRepository;
 import com.ufrn.imd.divide.ai.exception.BusinessException;
 import com.ufrn.imd.divide.ai.util.AttributeUtils;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,44 +30,45 @@ public class UserService {
         this.userMapper = userMapper;
     }
 
-
-
     public void delete(Long userId) {
-        if (userRepository.existsById(userId)) {
-            userRepository.deleteById(userId);
-        } else {
-            throw new ResourceNotFoundException("User with ID " + userId + " not found");
-        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with ID " + userId + " not found"));
+
+        user.setActive(false);
+        userRepository.save(user);
     }
+
 
     public UserResponseDTO update(UserRequestDTO dto, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "User with ID " + userId + " not found"
                 ));
-
+        if (!user.isActive()) {
+            throw new BusinessException("Cannot update an inactive user.", HttpStatus.BAD_REQUEST);
+        }
         BeanUtils.copyProperties(dto, user, AttributeUtils.getNullOrBlankPropertyNames(dto));
         validateBeforeSave(user);
         return userMapper.toDto(userRepository.save(user));
     }
 
-
-    public UserResponseDTO save(UserRequestDTO dto){
+    public UserResponseDTO save(UserRequestDTO dto) {
         User entity = userMapper.toEntity(dto);
-
         validateBeforeSave(entity);
 
         entity.setPassword(passwordEncoder.encode(entity.getPassword()));
+        entity.setActive(true);
+
         return userMapper.toDto(userRepository.save(entity));
     }
 
-    public void validateBeforeSave(User entity){
+    public void validateBeforeSave(User entity) {
         validateEmail(entity.getEmail(), entity.getId());
         validatePhoneNumber(entity.getPhoneNumber(), entity.getId());
     }
 
-    private void validateEmail(String email, Long id){
-        Optional<User> user = userRepository.findByEmailIgnoreCase(email);
+    private void validateEmail(String email, Long id) {
+        Optional<User> user = userRepository.findByEmailIgnoreCaseAndActiveTrue(email);
         if (user.isPresent() && (id == null || !user.get().getId().equals(id))) {
             throw new BusinessException(
                     "Invalid email: " + email + ". A user is already registered with this email.",
@@ -78,7 +78,7 @@ public class UserService {
     }
 
     private void validatePhoneNumber(String phone, Long id) {
-        Optional<User> user = userRepository.findByPhoneNumber(phone);
+        Optional<User> user = userRepository.findByPhoneNumberAndActiveTrue(phone);
         if (user.isPresent() && (id == null || !user.get().getId().equals(id))) {
             throw new BusinessException(
                     "Invalid phone number: " + phone + ". A user is already registered with this phone number.",
