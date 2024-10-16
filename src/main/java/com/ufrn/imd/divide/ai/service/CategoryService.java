@@ -26,6 +26,10 @@ public class CategoryService {
         return categoryRepository.save(category);
     }
 
+    public List<Category> getCategoriesBySubstring(String name) {
+        return categoryRepository.findByNameContainingIgnoreCase(name);
+    }
+
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
     }

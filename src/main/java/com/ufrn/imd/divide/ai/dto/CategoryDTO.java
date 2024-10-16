@@ -1,9 +1,9 @@
-package com.ufrn.imd.divide.ai.dto.response;
+package com.ufrn.imd.divide.ai.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record CategoryResponseDTO(
+public record CategoryDTO(
         Long id,
         String name,
         String description,
