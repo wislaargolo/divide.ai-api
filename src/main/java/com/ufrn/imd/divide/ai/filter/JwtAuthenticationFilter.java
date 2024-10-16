@@ -1,22 +1,22 @@
 package com.ufrn.imd.divide.ai.filter;
 
-import com.ufrn.imd.divide.ai.repository.UserRepository;
-import com.ufrn.imd.divide.ai.service.AuthenticationService;
 import com.ufrn.imd.divide.ai.service.JwtService;
 import com.ufrn.imd.divide.ai.service.UserDetailsServiceImpl;
-import com.ufrn.imd.divide.ai.service.UserService;
+import com.ufrn.imd.divide.ai.util.EndpointChecker;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpMethod;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.io.IOException;
 
@@ -24,13 +24,18 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-
     private final UserDetailsServiceImpl userDetailsServiceImpl;
+    private final HandlerExceptionResolver handlerExceptionResolver;
+    private final EndpointChecker endpointChecker;
 
-
-    public JwtAuthenticationFilter(JwtService jwtService, UserDetailsServiceImpl userDetailsServiceImpl) {
+    public JwtAuthenticationFilter(JwtService jwtService,
+                                   UserDetailsServiceImpl userDetailsServiceImpl,
+                                   HandlerExceptionResolver handlerExceptionResolver,
+                                   EndpointChecker endpointChecker) {
         this.jwtService = jwtService;
         this.userDetailsServiceImpl = userDetailsServiceImpl;
+        this.handlerExceptionResolver = handlerExceptionResolver;
+        this.endpointChecker = endpointChecker;
     }
 
 
@@ -40,6 +45,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain)
             throws ServletException, IOException {
+
+        if (!endpointChecker.isEndpointExist(request)) {
+            handlerExceptionResolver.resolveException(
+                    request,
+                    response,
+                    null,
+                    new NoResourceFoundException(HttpMethod.valueOf(request.getMethod()), request.getRequestURI())
+            );
+            return;
+        }
 
         String token = recoverToken(request);
 

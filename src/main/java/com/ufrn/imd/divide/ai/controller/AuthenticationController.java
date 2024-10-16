@@ -22,11 +22,13 @@ public class AuthenticationController {
     }
 
     @PostMapping("/authenticate")
-    public ApiResponseDTO<AuthResponseDTO> authenticate(@RequestBody @Valid AuthRequestDTO request) {
-        return new ApiResponseDTO<>(
-                        true,
-                        "Authentication completed successfully",
-                        authenticationService.authenticate(request),
-                        null);
+    public ResponseEntity<ApiResponseDTO<AuthResponseDTO>> authenticate(@RequestBody @Valid AuthRequestDTO request) {
+        ApiResponseDTO<AuthResponseDTO> response = new ApiResponseDTO<>(
+                true,
+                "Authentication completed successfully",
+                authenticationService.authenticate(request),
+                null);
+
+        return ResponseEntity.ok(response);
     }
 }
