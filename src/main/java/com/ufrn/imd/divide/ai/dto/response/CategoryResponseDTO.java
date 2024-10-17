@@ -1,13 +1,13 @@
-package com.ufrn.imd.divide.ai.dto;
+package com.ufrn.imd.divide.ai.dto.response;
+
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record CategoryDTO(
+public record CategoryResponseDTO(
         Long id,
         String name,
         String description,
         String color
 ) {
 }
-

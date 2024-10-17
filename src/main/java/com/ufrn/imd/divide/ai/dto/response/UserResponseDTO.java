@@ -2,7 +2,7 @@ package com.ufrn.imd.divide.ai.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record UserResponseDTO(
@@ -11,7 +11,7 @@ public record UserResponseDTO(
         String firstName,
         String lastName,
         String phoneNumber,
-        boolean active
+        LocalDateTime createdAt
 
 ) {
 }

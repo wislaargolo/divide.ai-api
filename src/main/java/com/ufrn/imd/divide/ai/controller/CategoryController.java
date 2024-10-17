@@ -1,16 +1,15 @@
 package com.ufrn.imd.divide.ai.controller;
 
-import com.ufrn.imd.divide.ai.dto.CategoryDTO;
+import com.ufrn.imd.divide.ai.dto.request.CategoryRequestDTO;
 import com.ufrn.imd.divide.ai.dto.response.ApiResponseDTO;
-import com.ufrn.imd.divide.ai.model.Category;
+import com.ufrn.imd.divide.ai.dto.response.CategoryResponseDTO;
 import com.ufrn.imd.divide.ai.service.CategoryService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:5173")
@@ -24,11 +23,12 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponseDTO<CategoryDTO>> createCategory(@RequestBody CategoryDTO categoryDTO) {
-        CategoryDTO newCategory = categoryService.saveCategory(categoryDTO);
-        ApiResponseDTO<CategoryDTO> response = new ApiResponseDTO<>(
+    public ResponseEntity<ApiResponseDTO<CategoryResponseDTO>> createCategory(
+            @Valid @RequestBody CategoryRequestDTO categoryDTO) {
+        CategoryResponseDTO newCategory = categoryService.saveCategory(categoryDTO);
+        ApiResponseDTO<CategoryResponseDTO> response = new ApiResponseDTO<>(
                 true,
-                "Success: Category created successfully.",
+                "Category created successfully.",
                 newCategory,
                 null
         );
@@ -37,12 +37,12 @@ public class CategoryController {
 
 
     @GetMapping
-    public ResponseEntity<ApiResponseDTO<List<CategoryDTO>>> getAllCategories() {
-        List<CategoryDTO> categories = categoryService.getAllCategories();
+    public ResponseEntity<ApiResponseDTO<List<CategoryResponseDTO>>> getAllCategories() {
+        List<CategoryResponseDTO> categories = categoryService.getAllCategories();
 
-        ApiResponseDTO<List<CategoryDTO>> response = new ApiResponseDTO<>(
+        ApiResponseDTO<List<CategoryResponseDTO>> response = new ApiResponseDTO<>(
                 true,
-                "Success: Categories retrieved successfully.",
+                "Categories retrieved successfully.",
                 categories,
                 null
         );
@@ -51,22 +51,13 @@ public class CategoryController {
     }
 
     @GetMapping("/name/{name}")
-    public ResponseEntity<ApiResponseDTO<List<CategoryDTO>>> getCategoriesByName(@PathVariable String name) {
-        List<CategoryDTO> categories = categoryService.getCategoriesBySubstring(name);
+    public ResponseEntity<ApiResponseDTO<List<CategoryResponseDTO>>> getCategoriesByName(
+            @PathVariable String name) {
+        List<CategoryResponseDTO> categories = categoryService.getCategoriesBySubstring(name);
 
-        if (categories.isEmpty()) {
-            ApiResponseDTO<List<CategoryDTO>> response = new ApiResponseDTO<>(
-                    false,
-                    "Error: No categories found with the given name.",
-                    null,
-                    null
-            );
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
-
-        ApiResponseDTO<List<CategoryDTO>> response = new ApiResponseDTO<>(
+        ApiResponseDTO<List<CategoryResponseDTO>> response = new ApiResponseDTO<>(
                 true,
-                "Success: Categories retrieved successfully.",
+                "Categories retrieved successfully.",
                 categories,
                 null
         );
@@ -75,15 +66,15 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponseDTO<CategoryDTO>> updateCategory(
+    public ResponseEntity<ApiResponseDTO<CategoryResponseDTO>> updateCategory(
             @PathVariable Long id,
-            @RequestBody CategoryDTO categoryDetails) {
+            @RequestBody CategoryRequestDTO categoryDetails) {
 
-        CategoryDTO updatedCategory = categoryService.updateCategory(id, categoryDetails);
+        CategoryResponseDTO updatedCategory = categoryService.updateCategory(id, categoryDetails);
 
-         ApiResponseDTO<CategoryDTO> response = new ApiResponseDTO<>(
+         ApiResponseDTO<CategoryResponseDTO> response = new ApiResponseDTO<>(
                  true,
-                 "Success: Category updated successfully.",
+                 "Category updated successfully.",
                  updatedCategory,
                  null
          );
@@ -102,24 +93,15 @@ public class CategoryController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponseDTO<Void>> deleteCategory(@PathVariable Long id) {
-        boolean isDeleted = categoryService.deleteCategory(id);
+        categoryService.deleteCategory(id);
 
-        if (isDeleted) {
-            ApiResponseDTO<Void> response = new ApiResponseDTO<>(
-                    true,
-                    "Success: Category deleted successfully.",
-                    null,
-                    null
-            );
-            return ResponseEntity.ok(response);
-        } else {
-            ApiResponseDTO<Void> response = new ApiResponseDTO<>(
-                    false,
-                    "Error: Category not found.",
-                    null,
-                    null
-            );
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
+        ApiResponseDTO<Void> response = new ApiResponseDTO<>(
+                true,
+                "Category deleted successfully",
+                null,
+                null
+        );
+
+        return ResponseEntity.ok(response);
     }
 }

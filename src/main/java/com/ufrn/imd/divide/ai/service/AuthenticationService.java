@@ -33,7 +33,7 @@ public class AuthenticationService {
                 )
         );
 
-        User user = userRepository.findByEmailIgnoreCaseAndActiveTrue(request.email())
+        User user = userRepository.findByEmailIgnoreCase(request.email())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         String token = jwtService.generateToken(new UserDetailsImpl(user));

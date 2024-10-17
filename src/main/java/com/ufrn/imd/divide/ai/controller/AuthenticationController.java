@@ -22,7 +22,8 @@ public class AuthenticationController {
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<ApiResponseDTO<AuthResponseDTO>> authenticate(@RequestBody @Valid AuthRequestDTO request) {
+    public ResponseEntity<ApiResponseDTO<AuthResponseDTO>> authenticate(
+            @Valid @RequestBody AuthRequestDTO request) {
         ApiResponseDTO<AuthResponseDTO> response = new ApiResponseDTO<>(
                 true,
                 "Authentication completed successfully",

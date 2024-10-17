@@ -2,6 +2,7 @@ package com.ufrn.imd.divide.ai.exception;
 
 import com.ufrn.imd.divide.ai.dto.response.ApiResponseDTO;
 import com.ufrn.imd.divide.ai.dto.response.ErrorResponseDTO;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -79,6 +80,25 @@ public class ControllerExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<ApiResponseDTO<ErrorResponseDTO>> handleExpiredJwtException(ExpiredJwtException exception, WebRequest request) {
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(
+                ZonedDateTime.now(),
+                HttpStatus.UNAUTHORIZED.value(),
+                HttpStatus.UNAUTHORIZED.getReasonPhrase(),
+                exception.getMessage(),
+                request.getDescription(false));
+
+        ApiResponseDTO<ErrorResponseDTO> response = new ApiResponseDTO<>(
+                false,
+                "Token expired",
+                null,
+                errorResponse
+        );
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

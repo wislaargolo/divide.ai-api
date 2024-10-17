@@ -1,15 +1,13 @@
 package com.ufrn.imd.divide.ai.controller;
 
-import com.ufrn.imd.divide.ai.dto.request.UserRequestDTO;
+import com.ufrn.imd.divide.ai.dto.request.UserCreateRequestDTO;
+import com.ufrn.imd.divide.ai.dto.request.UserUpdateRequestDTO;
 import com.ufrn.imd.divide.ai.dto.response.ApiResponseDTO;
 import com.ufrn.imd.divide.ai.dto.response.UserResponseDTO;
 import com.ufrn.imd.divide.ai.service.UserService;
-import com.ufrn.imd.divide.ai.util.validation.OnCreate;
 import jakarta.validation.Valid;
-import jakarta.validation.groups.Default;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,9 +20,9 @@ public class UserController {
         this.userService = userService;
     }
 
-    @DeleteMapping("/{userId}")
-    public ResponseEntity<ApiResponseDTO<?>> delete(@PathVariable Long userId) {
-        userService.delete(userId);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponseDTO<?>> delete(@PathVariable Long id) {
+        userService.delete(id);
         ApiResponseDTO<?> response = new ApiResponseDTO<>(
                 true,
                 "User deleted successfully",
@@ -34,15 +32,15 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{userId}")
+    @PutMapping("/{id}")
     public ResponseEntity<ApiResponseDTO<UserResponseDTO>> update(
-            @PathVariable Long userId,
-            @RequestBody @Valid UserRequestDTO dto) {
+            @PathVariable Long id,
+            @RequestBody @Valid UserUpdateRequestDTO dto) {
 
         ApiResponseDTO<UserResponseDTO> response = new ApiResponseDTO<>(
                 true,
                 "User updated successfully.",
-                userService.update(dto, userId),
+                userService.update(dto, id),
                 null
         );
         return ResponseEntity.ok(response);
@@ -50,8 +48,7 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponseDTO<UserResponseDTO>> save(
-            @Validated({Default.class, OnCreate.class})
-            @RequestBody UserRequestDTO dto){
+            @Valid @RequestBody UserCreateRequestDTO dto) {
 
         ApiResponseDTO<UserResponseDTO> response = new ApiResponseDTO<>(
                 true,

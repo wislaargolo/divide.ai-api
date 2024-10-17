@@ -1,10 +1,16 @@
 package com.ufrn.imd.divide.ai.service;
 
-import com.ufrn.imd.divide.ai.dto.CategoryDTO;
+import com.ufrn.imd.divide.ai.dto.request.CategoryRequestDTO;
+import com.ufrn.imd.divide.ai.dto.response.CategoryResponseDTO;
+import com.ufrn.imd.divide.ai.exception.BusinessException;
 import com.ufrn.imd.divide.ai.exception.ResourceNotFoundException;
 import com.ufrn.imd.divide.ai.mapper.CategoryMapper;
 import com.ufrn.imd.divide.ai.model.Category;
+import com.ufrn.imd.divide.ai.model.User;
 import com.ufrn.imd.divide.ai.repository.CategoryRepository;
+import com.ufrn.imd.divide.ai.util.AttributeUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,8 +19,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class CategoryService {
-    private final CategoryMapper categoryMapper;
 
+    private final CategoryMapper categoryMapper;
 
     private final CategoryRepository categoryRepository;
 
@@ -23,56 +29,72 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
-    public CategoryDTO saveCategory(CategoryDTO category) {
+    public CategoryResponseDTO saveCategory(CategoryRequestDTO category) {
         List<Category> existingCategory = categoryRepository.findByName(category.name());
 
         if (!existingCategory.isEmpty()) {
-            throw new Error("Categoria com o nome '" + category.name() + "' já existe.");
+            throw new BusinessException(
+                    "Categoria com o nome '" + category.name() + "' já existe.", HttpStatus.BAD_REQUEST
+            );
         }
 
         Category c = categoryMapper.toEntity(category);
         return categoryMapper.toDto(categoryRepository.save(c));
     }
 
-    public List<CategoryDTO> getCategoriesBySubstring(String name) {
+    public List<CategoryResponseDTO> getCategoriesBySubstring(String name) {
 
-        return categoryRepository.findByNameContainingIgnoreCase(name).stream().map(categoryMapper::toDto).collect(Collectors.toList());
+        List<Category> categories = categoryRepository
+                .findByNameContainingIgnoreCase(name);
+
+        if (categories.isEmpty()) {
+            throw new ResourceNotFoundException("No categories found with name: " + name);
+        }
+
+        return categories.stream()
+                .map(categoryMapper::toDto)
+                .collect(Collectors.toList());
     }
 
-    public List<CategoryDTO> getAllCategories() {
-        return categoryRepository.findAll().stream().map(categoryMapper::toDto).collect(Collectors.toList());
+    public List<CategoryResponseDTO> getAllCategories() {
+        return categoryRepository
+                .findAll()
+                .stream()
+                .map(categoryMapper::toDto)
+                .collect(Collectors.toList());
     }
 
-    public CategoryDTO getCategoryById(Long id) {
+    public CategoryResponseDTO getCategoryById(Long id) {
         Optional<Category> category =  categoryRepository.findById(id);
-        if ( category.isPresent()){
+        if (category.isPresent()){
             return categoryMapper.toDto(category.get());
 
         }
         throw new ResourceNotFoundException("Category not found");
     }
 
-    public CategoryDTO updateCategory(Long id, CategoryDTO categoryDetails) {
+    public CategoryResponseDTO updateCategory(Long id, CategoryRequestDTO categoryDetails) {
         Optional<Category> c =  categoryRepository.findById(id);
-        if ( c.isPresent()){
+        if (c.isPresent()){
             Category category = c.get();
-            category.setName(categoryDetails.name());
-            category.setDescription(categoryDetails.description());
-            category.setColor(categoryDetails.color());
-
+            BeanUtils.copyProperties(categoryDetails, category, AttributeUtils.getNullOrBlankPropertyNames(categoryDetails));
             return categoryMapper.toDto(categoryRepository.save(category));
         }
         throw new ResourceNotFoundException("Category not updated");
     }
 
-    public List<Category> getCategoryByName(String name) {
-        return categoryRepository.findByName(name);
+    public List<CategoryResponseDTO> getCategoryByName(String name) {
+        return categoryRepository.findByName(name)
+                .stream()
+                .map(categoryMapper::toDto)
+                .collect(Collectors.toList());
     }
 
-    public boolean deleteCategory(Long id) {
-        return categoryRepository.findById(id).map(category -> {
-            categoryRepository.delete(category);
-            return true;
-        }).orElse(false);
+    public void deleteCategory(Long id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+
+        category.setActive(false);
+        categoryRepository.save(category);
     }
 }

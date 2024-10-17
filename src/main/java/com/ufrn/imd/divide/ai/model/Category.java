@@ -1,18 +1,12 @@
 package com.ufrn.imd.divide.ai.model;
 
 import jakarta.persistence.*;
-
-import java.io.Serializable;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(name = "categories")
-public class Category implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+@Where(clause = "active = true")
+public class Category extends BaseEntity {
 
     @Column(nullable = false)
     private String name;
@@ -22,14 +16,6 @@ public class Category implements Serializable {
 
     @Column
     private String color;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -54,4 +40,5 @@ public class Category implements Serializable {
     public void setColor(String color) {
         this.color = color;
     }
+
 }
