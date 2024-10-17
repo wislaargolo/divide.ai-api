@@ -24,9 +24,9 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponseDTO<Category>> createCategory(@RequestBody Category category) {
-        Category newCategory = categoryService.saveCategory(category);
-        ApiResponseDTO<Category> response = new ApiResponseDTO<>(
+    public ResponseEntity<ApiResponseDTO<CategoryDTO>> createCategory(@RequestBody CategoryDTO categoryDTO) {
+        CategoryDTO newCategory = categoryService.saveCategory(categoryDTO);
+        ApiResponseDTO<CategoryDTO> response = new ApiResponseDTO<>(
                 true,
                 "Success: Category created successfully.",
                 newCategory,
@@ -38,16 +38,12 @@ public class CategoryController {
 
     @GetMapping
     public ResponseEntity<ApiResponseDTO<List<CategoryDTO>>> getAllCategories() {
-        List<Category> categories = categoryService.getAllCategories();
-
-        List<CategoryDTO> categoryDTOs = categories.stream()
-                .map(category -> new CategoryDTO(category.getId(), category.getName(), category.getDescription(), category.getColor()))
-                .collect(Collectors.toList());
+        List<CategoryDTO> categories = categoryService.getAllCategories();
 
         ApiResponseDTO<List<CategoryDTO>> response = new ApiResponseDTO<>(
                 true,
                 "Success: Categories retrieved successfully.",
-                categoryDTOs,
+                categories,
                 null
         );
 
@@ -56,7 +52,7 @@ public class CategoryController {
 
     @GetMapping("/name/{name}")
     public ResponseEntity<ApiResponseDTO<List<CategoryDTO>>> getCategoriesByName(@PathVariable String name) {
-        List<Category> categories = categoryService.getCategoriesBySubstring(name);
+        List<CategoryDTO> categories = categoryService.getCategoriesBySubstring(name);
 
         if (categories.isEmpty()) {
             ApiResponseDTO<List<CategoryDTO>> response = new ApiResponseDTO<>(
@@ -68,19 +64,10 @@ public class CategoryController {
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
 
-        List<CategoryDTO> categoryDTOs = categories.stream()
-                .map(category -> new CategoryDTO(
-                        category.getId(),
-                        category.getName(),
-                        category.getDescription(),
-                        category.getColor()
-                ))
-                .collect(Collectors.toList());
-
         ApiResponseDTO<List<CategoryDTO>> response = new ApiResponseDTO<>(
                 true,
                 "Success: Categories retrieved successfully.",
-                categoryDTOs,
+                categories,
                 null
         );
 
@@ -90,37 +77,27 @@ public class CategoryController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponseDTO<CategoryDTO>> updateCategory(
             @PathVariable Long id,
-            @RequestBody Category categoryDetails) {
+            @RequestBody CategoryDTO categoryDetails) {
 
-        Optional<Category> updatedCategory = categoryService.updateCategory(id, categoryDetails);
+        CategoryDTO updatedCategory = categoryService.updateCategory(id, categoryDetails);
 
-        return updatedCategory
-                .map(cat -> {
-                    CategoryDTO categoryDTO = new CategoryDTO(
-                            cat.getId(),
-                            cat.getName(),
-                            cat.getDescription(),
-                            cat.getColor()
-                    );
+         ApiResponseDTO<CategoryDTO> response = new ApiResponseDTO<>(
+                 true,
+                 "Success: Category updated successfully.",
+                 updatedCategory,
+                 null
+         );
+         return ResponseEntity.ok(response);
 
-                    ApiResponseDTO<CategoryDTO> response = new ApiResponseDTO<>(
-                            true,
-                            "Success: Category updated successfully.",
-                            categoryDTO,
-                            null
-                    );
-
-                    return ResponseEntity.ok(response);
-                })
-                .orElseGet(() -> {
-                    ApiResponseDTO<CategoryDTO> response = new ApiResponseDTO<>(
-                            false,
-                            "Error: Category not found.",
-                            null,
-                            null
-                    );
-                    return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-                });
+//                .orElseGet(() -> {
+//                    ApiResponseDTO<CategoryDTO> response = new ApiResponseDTO<>(
+//                            false,
+//                            "Error: Category not found.",
+//                            null,
+//                            null
+//                    );
+//                    return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+//                });
     }
 
     @DeleteMapping("/{id}")

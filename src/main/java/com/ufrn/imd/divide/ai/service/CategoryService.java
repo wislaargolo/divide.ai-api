@@ -1,50 +1,68 @@
 package com.ufrn.imd.divide.ai.service;
 
+import com.ufrn.imd.divide.ai.dto.CategoryDTO;
+import com.ufrn.imd.divide.ai.exception.ResourceNotFoundException;
+import com.ufrn.imd.divide.ai.mapper.CategoryMapper;
 import com.ufrn.imd.divide.ai.model.Category;
 import com.ufrn.imd.divide.ai.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryService {
+    private final CategoryMapper categoryMapper;
+
 
     private final CategoryRepository categoryRepository;
 
-    public CategoryService(CategoryRepository categoryRepository) {
+    public CategoryService(CategoryMapper categoryMapper, CategoryRepository categoryRepository) {
+        this.categoryMapper = categoryMapper;
         this.categoryRepository = categoryRepository;
     }
 
-    public Category saveCategory(Category category) {
-        List<Category> existingCategory = categoryRepository.findByName(category.getName());
+    public CategoryDTO saveCategory(CategoryDTO category) {
+        List<Category> existingCategory = categoryRepository.findByName(category.name());
 
         if (!existingCategory.isEmpty()) {
-            throw new Error("Categoria com o nome '" + category.getName() + "' já existe.");
+            throw new Error("Categoria com o nome '" + category.name() + "' já existe.");
         }
 
-        return categoryRepository.save(category);
+        Category c = categoryMapper.toEntity(category);
+        return categoryMapper.toDto(categoryRepository.save(c));
     }
 
-    public List<Category> getCategoriesBySubstring(String name) {
-        return categoryRepository.findByNameContainingIgnoreCase(name);
+    public List<CategoryDTO> getCategoriesBySubstring(String name) {
+
+        return categoryRepository.findByNameContainingIgnoreCase(name).stream().map(categoryMapper::toDto).collect(Collectors.toList());
     }
 
-    public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
+    public List<CategoryDTO> getAllCategories() {
+        return categoryRepository.findAll().stream().map(categoryMapper::toDto).collect(Collectors.toList());
     }
 
-    public Optional<Category> getCategoryById(Long id) {
-        return categoryRepository.findById(id);
+    public CategoryDTO getCategoryById(Long id) {
+        Optional<Category> category =  categoryRepository.findById(id);
+        if ( category.isPresent()){
+            return categoryMapper.toDto(category.get());
+
+        }
+        throw new ResourceNotFoundException("Category not found");
     }
 
-    public Optional<Category> updateCategory(Long id, Category categoryDetails) {
-        return categoryRepository.findById(id).map(category -> {
-            category.setName(categoryDetails.getName());
-            category.setDescription(categoryDetails.getDescription());
-            category.setColor(categoryDetails.getColor());
-            return categoryRepository.save(category);
-        });
+    public CategoryDTO updateCategory(Long id, CategoryDTO categoryDetails) {
+        Optional<Category> c =  categoryRepository.findById(id);
+        if ( c.isPresent()){
+            Category category = c.get();
+            category.setName(categoryDetails.name());
+            category.setDescription(categoryDetails.description());
+            category.setColor(categoryDetails.color());
+
+            return categoryMapper.toDto(categoryRepository.save(category));
+        }
+        throw new ResourceNotFoundException("Category not updated");
     }
 
     public List<Category> getCategoryByName(String name) {
