@@ -40,7 +40,7 @@ public class CategoryService {
                     "Categoria com o nome '" + category.name() + "' já existe.", HttpStatus.BAD_REQUEST
             );
         }
-        User user = userRepository.findById(category)
+        User user = userRepository.findById(category.userId())
                 .orElseThrow(() -> new Error("Usuário com ID '" + category.userId() + "' não encontrado."));
         Category c = categoryMapper.toEntity(category);
         c.setUser(user);

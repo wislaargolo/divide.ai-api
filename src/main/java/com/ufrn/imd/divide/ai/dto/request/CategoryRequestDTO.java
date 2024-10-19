@@ -9,7 +9,11 @@ public record CategoryRequestDTO(
         String name,
         String description,
         @NotBlank
-        String color
+        String color,
+        @NotBlank
+        Boolean isExpense,
+        @NotBlank
+        Long userId
 ) {
 }
 
