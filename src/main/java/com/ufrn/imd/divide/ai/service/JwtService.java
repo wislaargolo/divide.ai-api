@@ -6,6 +6,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,18 @@ public class JwtService {
 
     @Value("${secret.key}")
     private String SECRET_KEY;
+
+    private final HttpServletRequest httpServletRequest;
+
+    public JwtService(HttpServletRequest httpServletRequest) {
+        this.httpServletRequest = httpServletRequest;
+    }
+
+    public Long extractUserIdFromRequest() {
+        String token = httpServletRequest.getHeader("Authorization").substring(7);
+        var userId = extractClaim(token, claims -> claims.get("id", String.class));
+        return Long.valueOf(userId);
+    }
 
     public boolean isValid(String token, UserDetails user){
         String username = extractUsername(token);
