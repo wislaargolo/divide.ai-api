@@ -17,6 +17,14 @@ public class Category extends BaseEntity {
     @Column
     private String color;
 
+    @Column
+    private Boolean isExpense;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+
     public String getName() {
         return name;
     }
@@ -41,4 +49,19 @@ public class Category extends BaseEntity {
         this.color = color;
     }
 
+    public Boolean getExpense() {
+        return isExpense;
+    }
+
+    public void setExpense(Boolean expense) {
+        isExpense = expense;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 }

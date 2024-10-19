@@ -11,6 +11,7 @@ import com.ufrn.imd.divide.ai.repository.CategoryRepository;
 import com.ufrn.imd.divide.ai.util.AttributeUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
+import com.ufrn.imd.divide.ai.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,10 +24,12 @@ public class CategoryService {
     private final CategoryMapper categoryMapper;
 
     private final CategoryRepository categoryRepository;
+    private final UserRepository userRepository;
 
-    public CategoryService(CategoryMapper categoryMapper, CategoryRepository categoryRepository) {
+    public CategoryService(CategoryMapper categoryMapper, CategoryRepository categoryRepository, UserRepository userRepository) {
         this.categoryMapper = categoryMapper;
         this.categoryRepository = categoryRepository;
+        this.userRepository = userRepository;
     }
 
     public CategoryResponseDTO saveCategory(CategoryRequestDTO category) {
@@ -37,8 +40,10 @@ public class CategoryService {
                     "Categoria com o nome '" + category.name() + "' já existe.", HttpStatus.BAD_REQUEST
             );
         }
-
+        User user = userRepository.findById(category)
+                .orElseThrow(() -> new Error("Usuário com ID '" + category.userId() + "' não encontrado."));
         Category c = categoryMapper.toEntity(category);
+        c.setUser(user);
         return categoryMapper.toDto(categoryRepository.save(c));
     }
 
