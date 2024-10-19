@@ -127,6 +127,27 @@ public class ControllerExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
+    @ExceptionHandler(ForbiddenOperationException.class)
+    public ResponseEntity<ApiResponseDTO<ErrorResponseDTO>> handleUnauthorizedUserException(
+            ForbiddenOperationException exception, WebRequest request) {
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(
+                ZonedDateTime.now(),
+                HttpStatus.FORBIDDEN.value(),
+                HttpStatus.FORBIDDEN.getReasonPhrase(),
+                exception.getMessage(),
+                request.getDescription(false)
+        );
+
+        ApiResponseDTO<ErrorResponseDTO> response = new ApiResponseDTO<>(
+                false,
+                "Forbidden error",
+                null,
+                errorResponse
+        );
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponseDTO<ErrorResponseDTO>> handleException(Exception exception, WebRequest request) {
         ErrorResponseDTO errorResponse = new ErrorResponseDTO(
