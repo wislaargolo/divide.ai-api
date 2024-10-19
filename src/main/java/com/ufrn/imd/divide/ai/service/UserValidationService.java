@@ -9,20 +9,24 @@ import org.springframework.stereotype.Service;
 public class UserValidationService {
 
     private final JwtService jwtService;
-    private final UserService userService;
 
-    public UserValidationService(JwtService jwtService, UserService userService) {
+    public UserValidationService(JwtService jwtService) {
         this.jwtService = jwtService;
-        this.userService = userService;
     }
 
-    public User validateUser(Long userId) {
+    public void validateUser(Long userId) {
         Long userIdToken = jwtService.extractUserIdFromRequest();
 
-        if (userId.equals(userIdToken)) {
-            return userService.findById(userId);
-        } else {
+        if (!userId.equals(userIdToken)) {
             throw new ForbiddenOperationException();
+        }
+    }
+
+    public void validateUser(Long userId, String errorMessage) {
+        Long userIdToken = jwtService.extractUserIdFromRequest();
+
+        if (!userId.equals(userIdToken)) {
+            throw new ForbiddenOperationException(errorMessage);
         }
     }
 }
