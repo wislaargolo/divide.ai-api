@@ -10,9 +10,9 @@ public record CategoryRequestDTO(
         String description,
         @NotBlank
         String color,
-        @NotBlank
-        Boolean isExpense,
-        @NotBlank
+        @NotNull
+        Boolean expense,
+        @NotNull
         Long userId
 ) {
 }

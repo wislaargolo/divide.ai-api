@@ -10,7 +10,8 @@ public record CategoryResponseDTO(
         String name,
         String description,
         String color,
-        Boolean isExpense,
-        Long userId
+        Boolean expense,
+        User userId
 ) {
 }
+

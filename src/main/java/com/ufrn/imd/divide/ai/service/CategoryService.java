@@ -42,6 +42,9 @@ public class CategoryService {
         }
         User user = userRepository.findById(category.userId())
                 .orElseThrow(() -> new Error("Usuário com ID '" + category.userId() + "' não encontrado."));
+        if (category.expense() == null) {
+            throw new BusinessException("O campo 'isExpense' não pode ser nulo.", HttpStatus.BAD_REQUEST);
+        }
         Category c = categoryMapper.toEntity(category);
         c.setUser(user);
         return categoryMapper.toDto(categoryRepository.save(c));
@@ -65,6 +68,15 @@ public class CategoryService {
         return categoryRepository
                 .findAll()
                 .stream()
+                .map(categoryMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+
+    public List<CategoryResponseDTO> getCategoriesByUserId(Long userId) {
+        List<Category> categories = categoryRepository.findByUserId(userId);
+
+        return categories.stream()
                 .map(categoryMapper::toDto)
                 .collect(Collectors.toList());
     }
