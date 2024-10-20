@@ -48,7 +48,7 @@ public class CategoryService {
                 .findByNameContainingIgnoreCase(name);
 
         if (categories.isEmpty()) {
-            throw new ResourceNotFoundException("No categories found with name: " + name);
+            throw new ResourceNotFoundException("Não foram encontradas categorias com o nome: " + name);
         }
 
         return categories.stream()
@@ -70,7 +70,7 @@ public class CategoryService {
             return categoryMapper.toDto(category.get());
 
         }
-        throw new ResourceNotFoundException("Category not found");
+        throw new ResourceNotFoundException("Categoria não encontrada.");
     }
 
     public CategoryResponseDTO updateCategory(Long id, CategoryRequestDTO categoryDetails) {
@@ -80,7 +80,7 @@ public class CategoryService {
             BeanUtils.copyProperties(categoryDetails, category, AttributeUtils.getNullOrBlankPropertyNames(categoryDetails));
             return categoryMapper.toDto(categoryRepository.save(category));
         }
-        throw new ResourceNotFoundException("Category not updated");
+        throw new ResourceNotFoundException("Categoria não encontrada.");
     }
 
     public List<CategoryResponseDTO> getCategoryByName(String name) {
@@ -92,7 +92,7 @@ public class CategoryService {
 
     public void deleteCategory(Long id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada."));
 
         category.setActive(false);
         categoryRepository.save(category);

@@ -30,7 +30,7 @@ public class GroupController {
 
         ApiResponseDTO<GroupResponseDTO> response = new ApiResponseDTO<>(
                 true,
-                "Group created successfully.",
+                "Grupo criado com sucesso.",
                 groupService.save(dto),
                 null
         );
@@ -45,7 +45,7 @@ public class GroupController {
 
         ApiResponseDTO<GroupResponseDTO> response = new ApiResponseDTO<>(
                 true,
-                "Group updated successfully.",
+                "Grupo atualizado com sucesso.",
                 groupService.update(id, dto),
                 null
         );
@@ -59,7 +59,7 @@ public class GroupController {
 
         ApiResponseDTO<?> response = new ApiResponseDTO<>(
                 true,
-                "Group deleted successfully.",
+                "Grupo removido com sucesso.",
                 null,
                 null
         );
@@ -73,7 +73,7 @@ public class GroupController {
 
         ApiResponseDTO<GroupResponseDTO> response = new ApiResponseDTO<>(
                 true,
-                "Group retrieved successfully.",
+                "Grupo retornado com sucesso.",
                 groupResponse,
                 null
         );
@@ -87,7 +87,7 @@ public class GroupController {
 
         ApiResponseDTO<List<GroupResponseDTO>> response = new ApiResponseDTO<>(
                 true,
-                "Groups retrieved successfully.",
+                "Grupos retornados com sucesso.",
                 groupService.findAllByUserId(userId),
                 null
         );
@@ -101,7 +101,7 @@ public class GroupController {
 
         ApiResponseDTO<GroupResponseDTO> response = new ApiResponseDTO<>(
                 true,
-                "User joined group successfully.",
+                "Usuário entrou no grupo com sucesso.",
                 groupService.joinGroupByCode(dto),
                 null
         );
@@ -116,7 +116,7 @@ public class GroupController {
 
             ApiResponseDTO<GroupResponseDTO> response = new ApiResponseDTO<>(
                     true,
-                    "User has successfully left the group",
+                    "Usuário saiu do grupo com sucesso.",
                     groupService.leaveGroup(groupId, userId),
                     null
             );

@@ -64,7 +64,7 @@ public class UserService {
     public User findById(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "User with ID " + userId + " not found"
+                        "Usuário de ID " + userId + " não encontrado."
                 ));
     }
 
@@ -77,7 +77,7 @@ public class UserService {
         Optional<User> user = userRepository.findByEmailIgnoreCase(email);
         if (user.isPresent() && (id == null || !user.get().getId().equals(id))) {
             throw new BusinessException(
-                    "Invalid email: " + email + ". A user is already registered with this email.",
+                    "E-mail inválido: " + email + ". Um usuário cadastrado já utiliza este e-mail.",
                     HttpStatus.BAD_REQUEST
             );
         }
@@ -87,7 +87,7 @@ public class UserService {
         Optional<User> user = userRepository.findByPhoneNumber(phone);
         if (user.isPresent() && (id == null || !user.get().getId().equals(id))) {
             throw new BusinessException(
-                    "Invalid phone number: " + phone + ". A user is already registered with this phone number.",
+                    "Número de telefone inválido: " + phone + ". Um usuário cadastrado já utiliza este número de telefone.",
                     HttpStatus.BAD_REQUEST
             );
         }

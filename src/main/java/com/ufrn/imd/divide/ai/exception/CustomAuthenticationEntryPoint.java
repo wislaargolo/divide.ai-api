@@ -31,13 +31,13 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
                 ZonedDateTime.now(),
                 HttpServletResponse.SC_UNAUTHORIZED,
                 "Unauthorized",
-                "Access denied. Please authenticate to access this resource.",
+                "Acesso negado. Por favor, autentique-se para acessar este recurso.",
                 request.getRequestURI()
         );
 
         ApiResponseDTO<ErrorResponseDTO> apiResponse = new ApiResponseDTO<>(
                 false,
-                "Authentication failed",
+                "Falha de autenticação.",
                 null,
                 errorResponse
         );

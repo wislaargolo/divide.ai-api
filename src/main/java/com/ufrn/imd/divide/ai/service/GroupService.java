@@ -46,7 +46,7 @@ public class GroupService {
 
     public void delete(Long groupId) {
         Group group = findByIdIfExists(groupId);
-        userValidationService.validateUser(group.getCreatedBy().getId(), "Only the owner of the group can delete it");
+        userValidationService.validateUser(group.getCreatedBy().getId(), "Apenas o dono do grupo pode removê-lo.");
         group.setActive(false);
         groupRepository.save(group);
     }
@@ -71,7 +71,7 @@ public class GroupService {
         Optional<Group> existingGroup = groupRepository.findByNameAndCreatedBy(dto.name(), creator);
         if (existingGroup.isPresent()) {
             throw new BusinessException(
-                    "You already have a group with the name: " + dto.name(),
+                    "Você já possui um grupo com o nome: " + dto.name(),
                     HttpStatus.BAD_REQUEST
             );
         }
@@ -79,7 +79,7 @@ public class GroupService {
 
     public GroupResponseDTO update(Long groupId, GroupUpdateRequestDTO dto) {
         Group group = findByIdIfExists(groupId);
-        userValidationService.validateUser(group.getCreatedBy().getId(), "Only the owner of the group can update it");
+        userValidationService.validateUser(group.getCreatedBy().getId(), "Apenas o dono do grupo pode atualiza-lo.");
 
         BeanUtils.copyProperties(dto, group, AttributeUtils.getNullOrBlankPropertyNames(dto));
         return groupMapper.toDto(groupRepository.save(group));
@@ -97,7 +97,7 @@ public class GroupService {
     public GroupResponseDTO findById(Long groupId) {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Group with ID " + groupId + " not found"
+                        "Grupo de ID " + groupId + " não encontrado."
                 ));
 
         return groupMapper.toDto(group);
@@ -106,7 +106,7 @@ public class GroupService {
     public Group findByIdIfExists(Long groupId) {
         return groupRepository.findById(groupId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Group with ID " + groupId + " not found"
+                        "Grupo de ID " + groupId + " não encontrado."
                 ));
     }
 
@@ -122,14 +122,14 @@ public class GroupService {
     public Group validateBeforeJoin(String code, Long userId) {
         Group group = groupRepository.findByCode(code)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Group with code " + code + " not found"
+                        "Grupo com código " + code + " não encontrado."
                 ));
 
         User user = userService.findById(userId);
 
         if (group.getMembers().contains(user)) {
             throw new BusinessException(
-                    "User is already a member of the group.",
+                    "Este usuário já é membro do grupo.",
                     HttpStatus.BAD_REQUEST
             );
         }
@@ -152,14 +152,14 @@ public class GroupService {
 
         if (group.getCreatedBy().equals(user)) {
             throw new BusinessException(
-                    "The group owner cannot leave the group. Use the remove group instead.",
+                    "O dono do grupo não pode sair. Ao invés disso, remova o grupo.",
                     HttpStatus.BAD_REQUEST
             );
         }
 
         if (!group.getMembers().contains(user)) {
             throw new BusinessException(
-                    "User is not a member of this group.",
+                    "O usuário não é membro deste grupo.",
                     HttpStatus.BAD_REQUEST
             );
         }
@@ -167,7 +167,7 @@ public class GroupService {
         List<Debt> unpaidDebts = debtRepository.findByUserAndGroupTransaction_GroupAndPaidAtIsNull(user, group);
         if (!unpaidDebts.isEmpty()) {
             throw new BusinessException(
-                    "User has unpaid debts in this group and cannot leave.",
+                    "O usuário possúi débitos não quitados e por isso não pode sair do grupo.",
                     HttpStatus.BAD_REQUEST
             );
         }

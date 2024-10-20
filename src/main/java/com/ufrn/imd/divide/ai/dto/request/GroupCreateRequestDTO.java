@@ -8,10 +8,10 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 public record GroupCreateRequestDTO(
-        @NotBlank(message = "Name is required")
+        @NotBlank(message = "name é obrigatório.")
         String name,
         String description,
-        @NotNull(message = "Creator is required")
+        @NotNull(message = "createdBy é obrigatório.")
         Long createdBy
 ) {
 }
