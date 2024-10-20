@@ -24,7 +24,9 @@ public class CategoryController {
     @PostMapping
     public ResponseEntity<ApiResponseDTO<CategoryResponseDTO>> createCategory(
             @Valid @RequestBody CategoryRequestDTO categoryDTO) {
+        System.out.println("antes do service" + categoryDTO);
         CategoryResponseDTO newCategory = categoryService.saveCategory(categoryDTO);
+        System.out.println("depois do service" + newCategory);
         ApiResponseDTO<CategoryResponseDTO> response = new ApiResponseDTO<>(
                 true,
                 "Categoria criada com sucesso.",
@@ -42,6 +44,20 @@ public class CategoryController {
         ApiResponseDTO<List<CategoryResponseDTO>> response = new ApiResponseDTO<>(
                 true,
                 "Categorias retornadas com sucesso.",
+                categories,
+                null
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<ApiResponseDTO<List<CategoryResponseDTO>>> getCategoriesByUserId(@PathVariable Long userId) {
+        List<CategoryResponseDTO> categories = categoryService.getCategoriesByUserId(userId);
+
+        ApiResponseDTO<List<CategoryResponseDTO>> response = new ApiResponseDTO<>(
+                true,
+                "Categories retrieved successfully for user with ID: " + userId,
                 categories,
                 null
         );
