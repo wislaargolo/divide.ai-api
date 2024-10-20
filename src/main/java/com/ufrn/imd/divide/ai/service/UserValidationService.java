@@ -14,19 +14,18 @@ public class UserValidationService {
         this.jwtService = jwtService;
     }
 
-    public void validateUser(Long userId) {
-        Long userIdToken = jwtService.extractUserIdFromRequest();
-
-        if (!userId.equals(userIdToken)) {
-            throw new ForbiddenOperationException();
-        }
-    }
-
     public void validateUser(Long userId, String errorMessage) {
         Long userIdToken = jwtService.extractUserIdFromRequest();
 
         if (!userId.equals(userIdToken)) {
-            throw new ForbiddenOperationException(errorMessage);
+            throw (errorMessage != null && !errorMessage.trim().isEmpty())
+                    ? new ForbiddenOperationException(errorMessage)
+                    : new ForbiddenOperationException();
         }
+
+    }
+
+    public void validateUser(Long userId) {
+        validateUser(userId, null);
     }
 }

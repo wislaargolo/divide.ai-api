@@ -10,4 +10,5 @@ public interface CategoryMapper {
     Category toEntity (CategoryRequestDTO categoryDTO);
 
     CategoryResponseDTO toDto(Category category);
+
 }

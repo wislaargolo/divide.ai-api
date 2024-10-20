@@ -10,8 +10,6 @@ public record UserResponseDTO(
         String email,
         String firstName,
         String lastName,
-        String phoneNumber,
-        LocalDateTime createdAt
-
+        String phoneNumber
 ) {
 }

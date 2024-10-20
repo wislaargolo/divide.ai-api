@@ -3,6 +3,7 @@ package com.ufrn.imd.divide.ai.service;
 import com.ufrn.imd.divide.ai.dto.request.UserCreateRequestDTO;
 import com.ufrn.imd.divide.ai.dto.request.UserUpdateRequestDTO;
 import com.ufrn.imd.divide.ai.dto.response.UserResponseDTO;
+import com.ufrn.imd.divide.ai.exception.ForbiddenOperationException;
 import com.ufrn.imd.divide.ai.exception.ResourceNotFoundException;
 import com.ufrn.imd.divide.ai.mapper.UserMapper;
 import com.ufrn.imd.divide.ai.model.User;
@@ -22,18 +23,21 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final UserValidationService userValidationService;
 
     public UserService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
-                       UserMapper userMapper) {
+                       UserMapper userMapper,
+                       UserValidationService userValidationService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
+        this.userValidationService = userValidationService;
     }
 
     public void delete(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User with ID " + userId + " not found"));
+        userValidationService.validateUser(userId);
+        User user = findById(userId);
 
         user.setActive(false);
         userRepository.save(user);
@@ -41,13 +45,9 @@ public class UserService {
 
 
     public UserResponseDTO update(UserUpdateRequestDTO dto, Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "User with ID " + userId + " not found"
-                ));
-//        if (!user.isActive()) {
-//            throw new BusinessException("Cannot update an inactive user.", HttpStatus.BAD_REQUEST);
-//        }
+        userValidationService.validateUser(userId);
+        User user = findById(userId);
+
         BeanUtils.copyProperties(dto, user, AttributeUtils.getNullOrBlankPropertyNames(dto));
         validateBeforeSave(user);
         return userMapper.toDto(userRepository.save(user));
@@ -59,6 +59,13 @@ public class UserService {
 
         entity.setPassword(passwordEncoder.encode(entity.getPassword()));
         return userMapper.toDto(userRepository.save(entity));
+    }
+
+    public User findById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "User with ID " + userId + " not found"
+                ));
     }
 
     public void validateBeforeSave(User entity) {

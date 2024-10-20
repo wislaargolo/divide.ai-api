@@ -4,12 +4,13 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Where;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "debts")
 @Where(clause = "active = true")
 public class Debt extends BaseEntity {
 
-    // talvez deixar lazy
     @ManyToOne
     @JoinColumn(nullable = false)
     private User user;
@@ -22,8 +23,7 @@ public class Debt extends BaseEntity {
     @Column(nullable = false)
     private Double amount;
 
-    @OneToOne
-    private Payment payment;
+    private LocalDateTime paidAt;
 
     public User getUser() {
         return user;
@@ -31,14 +31,6 @@ public class Debt extends BaseEntity {
 
     public void setUser(User user) {
         this.user = user;
-    }
-
-    public Double getAmount() {
-        return amount;
-    }
-
-    public void setAmount(Double amount) {
-        this.amount = amount;
     }
 
     public GroupTransaction getGroupTransaction() {
@@ -49,11 +41,19 @@ public class Debt extends BaseEntity {
         this.groupTransaction = groupTransaction;
     }
 
-    public Payment getPayment() {
-        return payment;
+    public Double getAmount() {
+        return amount;
     }
 
-    public void setPayment(Payment payment) {
-        this.payment = payment;
+    public void setAmount(Double amount) {
+        this.amount = amount;
+    }
+
+    public LocalDateTime getPaidAt() {
+        return paidAt;
+    }
+
+    public void setPaidAt(LocalDateTime paidAt) {
+        this.paidAt = paidAt;
     }
 }
