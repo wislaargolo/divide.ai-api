@@ -13,5 +13,5 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
     boolean existsByCode(String code);
     List<Group> findByMembers_Id(Long userId);
     Optional<Group> findByCode(String code);
-    Optional<Group> findByNameAndCreatedBy(String name, User createdBy);
+    Optional<Group> findByNameAndCreatedBy_Id(String name, Long createdById);
 }

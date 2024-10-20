@@ -23,6 +23,12 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String phoneNumber;
 
+    public User() {}
+
+    public User(Long id) {
+        super(id);
+    }
+
     public String getFirstName() {
         return firstName;
     }

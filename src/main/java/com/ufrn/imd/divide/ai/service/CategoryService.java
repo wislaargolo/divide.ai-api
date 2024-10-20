@@ -65,13 +65,19 @@ public class CategoryService {
     }
 
     public CategoryResponseDTO getCategoryById(Long id) {
+        Category category = getCategoryByIdIfExists(id);
+        return categoryMapper.toDto(category);
+    }
+
+    public Category getCategoryByIdIfExists(Long id) {
         Optional<Category> category =  categoryRepository.findById(id);
         if (category.isPresent()){
-            return categoryMapper.toDto(category.get());
+            return category.get();
 
         }
         throw new ResourceNotFoundException("Categoria não encontrada.");
     }
+
 
     public CategoryResponseDTO updateCategory(Long id, CategoryRequestDTO categoryDetails) {
         Optional<Category> c =  categoryRepository.findById(id);

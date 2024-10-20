@@ -21,6 +21,12 @@ public abstract class BaseEntity implements Serializable {
     @Column(nullable = false, updatable = false)
     protected LocalDateTime createdAt;
 
+    public BaseEntity() {}
+
+    public BaseEntity(Long id) {
+        this.id = id;
+    }
+
     @PrePersist
     protected void onCreate(){
         this.createdAt = LocalDateTime.now();

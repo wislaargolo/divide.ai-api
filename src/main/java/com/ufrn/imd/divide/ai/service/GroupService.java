@@ -13,12 +13,10 @@ import com.ufrn.imd.divide.ai.model.User;
 import com.ufrn.imd.divide.ai.repository.DebtRepository;
 import com.ufrn.imd.divide.ai.repository.GroupRepository;
 import com.ufrn.imd.divide.ai.util.AttributeUtils;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -54,36 +52,43 @@ public class GroupService {
 
 
     public GroupResponseDTO save(GroupCreateRequestDTO dto) {
-        userValidationService.validateUser(dto.createdBy());
-        User creator = userService.findById(dto.createdBy());
-        validateBeforeSave(dto, creator);
+
+        validateBeforeSave(dto.createdBy(), dto.name(), null);
 
         Group group = groupMapper.toEntity(dto);
 
-        group.setCreatedBy(creator);
+        group.setCreatedBy(new User(dto.createdBy()));
         group.setCode(generateUniqueCode());
-        group.setMembers(new ArrayList<>());
-        group.getMembers().add(creator);
+/*        group.setMembers(new ArrayList<>());
+        group.getMembers().add(creator);*/
 
         return groupMapper.toDto(groupRepository.save(group));
     }
 
-    private void validateBeforeSave(GroupCreateRequestDTO dto, User creator) {
-        Optional<Group> existingGroup = groupRepository.findByNameAndCreatedBy(dto.name(), creator);
-        if (existingGroup.isPresent()) {
+
+    public GroupResponseDTO update(Long groupId, GroupUpdateRequestDTO dto) {
+        Group group = findByIdIfExists(groupId);
+
+        validateBeforeSave(group.getCreatedBy().getId(), group.getName(), groupId);
+        BeanUtils.copyProperties(dto, group, AttributeUtils.getNullOrBlankPropertyNames(dto));
+
+        return groupMapper.toDto(groupRepository.save(group));
+    }
+
+    private void validateGroup(Long createdById, String name, Long groupId) {
+        Optional<Group> existingGroup = groupRepository.findByNameAndCreatedBy_Id(name, createdById);
+        if (existingGroup.isPresent() && !existingGroup.get().getId().equals(groupId)) {
             throw new BusinessException(
-                    "Você já possui um grupo com o nome: " + dto.name(),
+                    "Você já possui um grupo com o nome: " + name,
                     HttpStatus.BAD_REQUEST
             );
         }
     }
 
-    public GroupResponseDTO update(Long groupId, GroupUpdateRequestDTO dto) {
-        Group group = findByIdIfExists(groupId);
-        userValidationService.validateUser(group.getCreatedBy().getId(), "Apenas o dono do grupo pode atualiza-lo.");
-
-        BeanUtils.copyProperties(dto, group, AttributeUtils.getNullOrBlankPropertyNames(dto));
-        return groupMapper.toDto(groupRepository.save(group));
+    private void validateBeforeSave(Long createdBy, String name, Long groupId) {
+        userValidationService.validateUser(createdBy);
+        userService.findById(createdBy);
+        validateGroup(createdBy, name, groupId);
     }
 
 
@@ -96,11 +101,7 @@ public class GroupService {
     }
 
     public GroupResponseDTO findById(Long groupId) {
-        Group group = groupRepository.findById(groupId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Grupo de ID " + groupId + " não encontrado."
-                ));
-
+        Group group = findByIdIfExists(groupId);
         return groupMapper.toDto(group);
     }
 
@@ -112,7 +113,8 @@ public class GroupService {
     }
 
     public GroupResponseDTO joinGroupByCode(JoinGroupRequestDTO dto) {
-        Group group = validateBeforeJoin(dto.code(), dto.userId());
+        Group group = findByCodeIfExists(dto.code());
+        validateBeforeJoin(group, dto.userId());
 
         User user = userService.findById(dto.userId());
         group.getMembers().add(user);
@@ -120,14 +122,15 @@ public class GroupService {
         return groupMapper.toDto(groupRepository.save(group));
     }
 
-    public Group validateBeforeJoin(String code, Long userId) {
-        Group group = groupRepository.findByCode(code)
+    public Group findByCodeIfExists(String code) {
+        return groupRepository.findByCode(code)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Grupo com código " + code + " não encontrado."
                 ));
+    }
 
+    public void validateBeforeJoin(Group group, Long userId) {
         User user = userService.findById(userId);
-
         if (group.getMembers().contains(user)) {
             throw new BusinessException(
                     "Este usuário já é membro do grupo.",
@@ -135,7 +138,6 @@ public class GroupService {
             );
         }
 
-        return group;
     }
 
     public GroupResponseDTO leaveGroup(Long groupId, Long userId) {
@@ -182,7 +184,5 @@ public class GroupService {
         } while (groupRepository.existsByCode(code));
         return code;
     }
-
-
 
 }

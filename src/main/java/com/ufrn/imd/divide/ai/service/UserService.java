@@ -43,13 +43,16 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public void validateBeforeDelete() {
+
+    }
+
 
     public UserResponseDTO update(UserUpdateRequestDTO dto, Long userId) {
-        userValidationService.validateUser(userId);
         User user = findById(userId);
+        validateBeforeUpdate(user);
 
         BeanUtils.copyProperties(dto, user, AttributeUtils.getNullOrBlankPropertyNames(dto));
-        validateBeforeSave(user);
         return userMapper.toDto(userRepository.save(user));
     }
 
@@ -66,6 +69,11 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Usuário de ID " + userId + " não encontrado."
                 ));
+    }
+
+    public void validateBeforeUpdate(User entity) {
+        userValidationService.validateUser(entity.getId());
+        validateBeforeSave(entity);
     }
 
     public void validateBeforeSave(User entity) {
