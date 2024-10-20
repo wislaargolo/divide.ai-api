@@ -1,4 +1,4 @@
-package com.ufrn.imd.divide.ai.service;
+package com.ufrn.imd.divide.ai.service.impl;
 
 import com.ufrn.imd.divide.ai.model.User;
 import com.ufrn.imd.divide.ai.model.UserDetailsImpl;

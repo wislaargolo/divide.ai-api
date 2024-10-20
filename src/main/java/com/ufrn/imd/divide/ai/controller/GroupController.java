@@ -5,7 +5,6 @@ import com.ufrn.imd.divide.ai.dto.request.GroupUpdateRequestDTO;
 import com.ufrn.imd.divide.ai.dto.request.JoinGroupRequestDTO;
 import com.ufrn.imd.divide.ai.dto.response.ApiResponseDTO;
 import com.ufrn.imd.divide.ai.dto.response.GroupResponseDTO;
-import com.ufrn.imd.divide.ai.model.Group;
 import com.ufrn.imd.divide.ai.service.GroupService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
