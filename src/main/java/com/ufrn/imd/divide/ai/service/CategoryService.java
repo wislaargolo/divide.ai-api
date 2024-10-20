@@ -50,6 +50,8 @@ public class CategoryService {
         return categoryMapper.toDto(categoryRepository.save(c));
     }
 
+
+
     public List<CategoryResponseDTO> getCategoriesBySubstring(String name) {
 
         List<Category> categories = categoryRepository
@@ -75,6 +77,13 @@ public class CategoryService {
 
     public List<CategoryResponseDTO> getCategoriesByUserId(Long userId) {
         List<Category> categories = categoryRepository.findByUserId(userId);
+
+        return categories.stream()
+                .map(categoryMapper::toDto)
+                .collect(Collectors.toList());
+    }
+    public List<CategoryResponseDTO> getCategoriesByUserType(Long userId, boolean type) {
+        List<Category> categories = categoryRepository.findByUserIdAndExpense(userId, type);
 
         return categories.stream()
                 .map(categoryMapper::toDto)
