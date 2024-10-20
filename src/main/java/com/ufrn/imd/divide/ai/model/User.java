@@ -2,6 +2,12 @@ package com.ufrn.imd.divide.ai.model;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.Where;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "users")

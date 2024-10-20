@@ -11,6 +11,7 @@ import com.ufrn.imd.divide.ai.repository.CategoryRepository;
 import com.ufrn.imd.divide.ai.util.AttributeUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
+import com.ufrn.imd.divide.ai.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,10 +24,12 @@ public class CategoryService {
     private final CategoryMapper categoryMapper;
 
     private final CategoryRepository categoryRepository;
+    private final UserRepository userRepository;
 
-    public CategoryService(CategoryMapper categoryMapper, CategoryRepository categoryRepository) {
+    public CategoryService(CategoryMapper categoryMapper, CategoryRepository categoryRepository, UserRepository userRepository) {
         this.categoryMapper = categoryMapper;
         this.categoryRepository = categoryRepository;
+        this.userRepository = userRepository;
     }
 
     public CategoryResponseDTO saveCategory(CategoryRequestDTO category) {
@@ -37,10 +40,17 @@ public class CategoryService {
                     "Categoria com o nome '" + category.name() + "' já existe.", HttpStatus.BAD_REQUEST
             );
         }
-
+        User user = userRepository.findById(category.userId())
+                .orElseThrow(() -> new Error("Usuário com ID '" + category.userId() + "' não encontrado."));
+        if (category.expense() == null) {
+            throw new BusinessException("O campo 'isExpense' não pode ser nulo.", HttpStatus.BAD_REQUEST);
+        }
         Category c = categoryMapper.toEntity(category);
+        c.setUser(user);
         return categoryMapper.toDto(categoryRepository.save(c));
     }
+
+
 
     public List<CategoryResponseDTO> getCategoriesBySubstring(String name) {
 
@@ -60,6 +70,22 @@ public class CategoryService {
         return categoryRepository
                 .findAll()
                 .stream()
+                .map(categoryMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+
+    public List<CategoryResponseDTO> getCategoriesByUserId(Long userId) {
+        List<Category> categories = categoryRepository.findByUserId(userId);
+
+        return categories.stream()
+                .map(categoryMapper::toDto)
+                .collect(Collectors.toList());
+    }
+    public List<CategoryResponseDTO> getCategoriesByUserType(Long userId, boolean type) {
+        List<Category> categories = categoryRepository.findByUserIdAndExpense(userId, type);
+
+        return categories.stream()
                 .map(categoryMapper::toDto)
                 .collect(Collectors.toList());
     }
