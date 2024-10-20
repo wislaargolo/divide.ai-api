@@ -13,6 +13,7 @@ import com.ufrn.imd.divide.ai.model.User;
 import com.ufrn.imd.divide.ai.repository.DebtRepository;
 import com.ufrn.imd.divide.ai.repository.GroupRepository;
 import com.ufrn.imd.divide.ai.util.AttributeUtils;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
