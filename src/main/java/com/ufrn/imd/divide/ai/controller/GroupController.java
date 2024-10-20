@@ -122,4 +122,20 @@ public class GroupController {
             );
             return ResponseEntity.ok(response);
     }
+
+    @DeleteMapping("/{groupId}/user/{userId}/delete")
+    public ResponseEntity<ApiResponseDTO<GroupResponseDTO>> deleteMember(
+            @PathVariable Long groupId,
+            @PathVariable Long userId) {
+
+        ApiResponseDTO<GroupResponseDTO> response = new ApiResponseDTO<>(
+                true,
+                "Usuário foi removido do grupo com sucesso.",
+                groupService.deleteMember(groupId, userId),
+                null
+        );
+        return ResponseEntity.ok(response);
+    }
+
+
 }

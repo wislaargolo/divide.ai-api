@@ -17,6 +17,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -57,10 +58,11 @@ public class GroupService {
 
         Group group = groupMapper.toEntity(dto);
 
-        group.setCreatedBy(new User(dto.createdBy()));
+        User creator = new User(dto.createdBy());
+        group.setCreatedBy(creator);
         group.setCode(generateUniqueCode());
-/*        group.setMembers(new ArrayList<>());
-        group.getMembers().add(creator);*/
+        group.setMembers(new ArrayList<>());
+        group.getMembers().add(creator);
 
         return groupMapper.toDto(groupRepository.save(group));
     }
@@ -140,18 +142,32 @@ public class GroupService {
 
     }
 
-    public GroupResponseDTO leaveGroup(Long groupId, Long userId) {
-        userValidationService.validateUser(userId);
-        User user = userService.findById(userId);
+    public GroupResponseDTO deleteMember(Long groupId, Long userId) {
         Group group = findByIdIfExists(groupId);
+        User user = userService.findById(userId);
+        userValidationService.validateUser(
+                group.getCreatedBy().getId(),
+                "Apenas o dono do grupo pode remover um membro.");
 
-        validateBeforeLeave(group, user);
+        return deleteUserFromGroup(group, user);
+    }
+
+    public GroupResponseDTO leaveGroup(Long groupId, Long userId) {
+        Group group = findByIdIfExists(groupId);
+        User user = userService.findById(userId);
+        userValidationService.validateUser(userId);
+
+        return deleteUserFromGroup(group, user);
+    }
+
+    public GroupResponseDTO deleteUserFromGroup(Group group, User user) {
+        validateBeforeDelete(group, user);
 
         group.getMembers().remove(user);
         return groupMapper.toDto(groupRepository.save(group));
     }
 
-    public void validateBeforeLeave(Group group, User user) {
+    public void validateBeforeDelete(Group group, User user) {
 
         if (group.getCreatedBy().equals(user)) {
             throw new BusinessException(
