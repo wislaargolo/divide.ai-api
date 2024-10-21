@@ -75,26 +75,15 @@ public class GroupServiceImpl implements GroupService {
     public GroupResponseDTO update(Long groupId, GroupUpdateRequestDTO dto) {
         Group group = findByIdIfExists(groupId);
 
-        validateBeforeSave(group.getCreatedBy().getId(), group.getName(), groupId);
+        validateBeforeSave(group.getCreatedBy().getId(), dto.name(), groupId);
         BeanUtils.copyProperties(dto, group, AttributeUtils.getNullOrBlankPropertyNames(dto));
 
         return groupMapper.toDto(groupRepository.save(group));
     }
 
-    private void validateGroup(Long createdById, String name, Long groupId) {
-        Optional<Group> existingGroup = groupRepository.findByNameAndCreatedBy_Id(name, createdById);
-        if (existingGroup.isPresent() && !existingGroup.get().getId().equals(groupId)) {
-            throw new BusinessException(
-                    "Você já possui um grupo com o nome: " + name,
-                    HttpStatus.BAD_REQUEST
-            );
-        }
-    }
-
     private void validateBeforeSave(Long createdBy, String name, Long groupId) {
         userValidationService.validateUser(createdBy);
         userService.findById(createdBy);
-        validateGroup(createdBy, name, groupId);
     }
 
     @Override
