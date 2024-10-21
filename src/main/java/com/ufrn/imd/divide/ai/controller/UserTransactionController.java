@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/user-transactions")
@@ -58,6 +60,18 @@ public class UserTransactionController {
                 true,
                 "Transação removida com sucesso.",
                 null,
+                null
+        );
+
+        return ResponseEntity.ok(response);
+    }
+    @GetMapping("/transactions/{userId}")
+    public ResponseEntity<ApiResponseDTO<List<UserTransactionResponseDTO>>> getUserTransactions(@PathVariable Long userId) {
+
+        ApiResponseDTO<List<UserTransactionResponseDTO>> response = new ApiResponseDTO<>(
+                true,
+                "Transações recuperadas com sucesso.",
+                userTransactionService.findAllByUserId(userId),
                 null
         );
 

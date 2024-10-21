@@ -5,6 +5,8 @@ import com.ufrn.imd.divide.ai.dto.request.UserTransactionUpdateRequestDTO;
 import com.ufrn.imd.divide.ai.dto.response.UserTransactionResponseDTO;
 import com.ufrn.imd.divide.ai.model.UserTransaction;
 
+import java.util.List;
+
 public interface UserTransactionService {
     UserTransactionResponseDTO save(UserTransactionCreateRequestDTO dto);
 
@@ -15,4 +17,6 @@ public interface UserTransactionService {
     UserTransactionResponseDTO findById(Long userId);
 
     UserTransaction findByIdIfExists(Long id);
+
+    List<UserTransactionResponseDTO> findAllByUserId(Long userId);
 }

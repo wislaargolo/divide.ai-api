@@ -17,6 +17,9 @@ import com.ufrn.imd.divide.ai.util.AttributeUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class UserTransactionServiceImpl implements UserTransactionService {
 
@@ -48,8 +51,23 @@ public class UserTransactionServiceImpl implements UserTransactionService {
         UserTransaction userTransaction = userTransactionMapper.toEntity(dto);
         userTransaction.setUser(user);
         userTransaction.setCategory(category);
+        if (category.getExpense()){
+            userTransaction.setAmount(-dto.amount());
+
+        }
 
         return userTransactionMapper.toDto(userTransactionRepository.save(userTransaction));
+    }
+    @Override
+    public List<UserTransactionResponseDTO> findAllByUserId(Long userId) {
+        userValidationService.validateUser(userId);
+
+        User user = userService.findById(userId);
+        List<UserTransaction> userTransactions = userTransactionRepository.findAllByUser(user);
+
+        return userTransactions.stream()
+                .map(userTransactionMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override
