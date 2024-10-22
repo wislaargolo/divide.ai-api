@@ -87,13 +87,13 @@ public class CategoryController {
 
         CategoryResponseDTO updatedCategory = categoryService.updateCategory(id, categoryDetails);
 
-         ApiResponseDTO<CategoryResponseDTO> response = new ApiResponseDTO<>(
-                 true,
-                 "Category updated successfully.",
-                 updatedCategory,
-                 null
-         );
-         return ResponseEntity.ok(response);
+        ApiResponseDTO<CategoryResponseDTO> response = new ApiResponseDTO<>(
+                true,
+                "Category updated successfully.",
+                updatedCategory,
+                null
+        );
+        return ResponseEntity.ok(response);
 
 //                .orElseGet(() -> {
 //                    ApiResponseDTO<CategoryDTO> response = new ApiResponseDTO<>(
