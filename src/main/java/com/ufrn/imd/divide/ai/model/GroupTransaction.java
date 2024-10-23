@@ -12,12 +12,16 @@ import java.util.List;
 public class GroupTransaction extends Transaction {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "group_id", nullable = false)
     private Group group;
 
     @OneToMany(mappedBy="groupTransaction")
     @JsonManagedReference
     private List<Debt> debts;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User createdBy;
 
     public Group getGroup() {
         return group;
@@ -33,5 +37,13 @@ public class GroupTransaction extends Transaction {
 
     public void setDebts(List<Debt> debts) {
         this.debts = debts;
+    }
+
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
     }
 }

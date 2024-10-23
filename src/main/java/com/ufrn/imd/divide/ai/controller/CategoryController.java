@@ -29,7 +29,7 @@ public class CategoryController {
         System.out.println("depois do service" + newCategory);
         ApiResponseDTO<CategoryResponseDTO> response = new ApiResponseDTO<>(
                 true,
-                "Category created successfully.",
+                "Categoria criada com sucesso.",
                 newCategory,
                 null
         );
@@ -43,7 +43,7 @@ public class CategoryController {
 
         ApiResponseDTO<List<CategoryResponseDTO>> response = new ApiResponseDTO<>(
                 true,
-                "Categories retrieved successfully.",
+                "Categorias retornadas com sucesso.",
                 categories,
                 null
         );
@@ -72,7 +72,7 @@ public class CategoryController {
 
         ApiResponseDTO<List<CategoryResponseDTO>> response = new ApiResponseDTO<>(
                 true,
-                "Categories retrieved successfully.",
+                "Categorias retornadas com sucesso.",
                 categories,
                 null
         );
@@ -89,7 +89,7 @@ public class CategoryController {
 
          ApiResponseDTO<CategoryResponseDTO> response = new ApiResponseDTO<>(
                  true,
-                 "Category updated successfully.",
+                 "Categoria atualizada com sucesso.",
                  updatedCategory,
                  null
          );
@@ -112,7 +112,7 @@ public class CategoryController {
 
         ApiResponseDTO<Void> response = new ApiResponseDTO<>(
                 true,
-                "Category deleted successfully",
+                "Categoria removida com sucesso.",
                 null,
                 null
         );

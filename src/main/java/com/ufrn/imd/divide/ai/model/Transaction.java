@@ -10,6 +10,7 @@ public abstract class Transaction extends BaseEntity {
     @Column(nullable = false)
     private Double amount;
 
+    @Column(nullable = false)
     private String description;
 
     @ManyToOne
