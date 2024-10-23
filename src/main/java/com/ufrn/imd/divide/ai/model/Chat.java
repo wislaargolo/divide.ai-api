@@ -16,6 +16,7 @@ public class Chat {
 
     @Column(name = "chat_id")
     private String chatId;
+    
     @ManyToOne
     @JoinColumn(nullable = false, name = "user_id")
     private User user;
