@@ -1,4 +1,4 @@
-package com.ufrn.imd.divide.ai.service.impl;
+package com.ufrn.imd.divide.ai.service;
 
 import com.ufrn.imd.divide.ai.model.User;
 import com.ufrn.imd.divide.ai.model.UserDetailsImpl;
@@ -9,10 +9,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserDetailsServiceImpl implements UserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 
-    public UserDetailsServiceImpl(UserRepository userRepository) {
+    public CustomUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 

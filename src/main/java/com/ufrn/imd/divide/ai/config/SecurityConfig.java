@@ -2,7 +2,6 @@ package com.ufrn.imd.divide.ai.config;
 
 import com.ufrn.imd.divide.ai.exception.CustomAuthenticationEntryPoint;
 import com.ufrn.imd.divide.ai.filter.JwtAuthenticationFilter;
-import com.ufrn.imd.divide.ai.service.impl.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

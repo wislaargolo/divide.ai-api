@@ -5,7 +5,7 @@ import com.ufrn.imd.divide.ai.dto.request.GroupUpdateRequestDTO;
 import com.ufrn.imd.divide.ai.dto.request.JoinGroupRequestDTO;
 import com.ufrn.imd.divide.ai.dto.response.ApiResponseDTO;
 import com.ufrn.imd.divide.ai.dto.response.GroupResponseDTO;
-import com.ufrn.imd.divide.ai.service.GroupService;
+import com.ufrn.imd.divide.ai.service.interfaces.IGroupService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +17,9 @@ import java.util.List;
 @RequestMapping("/groups")
 public class GroupController {
 
-    private final GroupService groupService;
+    private final IGroupService groupService;
 
-    public GroupController(GroupService groupService) {
+    public GroupController(IGroupService groupService) {
         this.groupService = groupService;
     }
 

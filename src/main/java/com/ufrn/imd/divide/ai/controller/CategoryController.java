@@ -3,7 +3,7 @@ package com.ufrn.imd.divide.ai.controller;
 import com.ufrn.imd.divide.ai.dto.request.CategoryRequestDTO;
 import com.ufrn.imd.divide.ai.dto.response.ApiResponseDTO;
 import com.ufrn.imd.divide.ai.dto.response.CategoryResponseDTO;
-import com.ufrn.imd.divide.ai.service.CategoryService;
+import com.ufrn.imd.divide.ai.service.interfaces.ICategoryService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,9 +15,9 @@ import java.util.List;
 @RequestMapping("/categories")
 public class CategoryController {
 
-    private final CategoryService categoryService;
+    private final ICategoryService categoryService;
 
-    public CategoryController(CategoryService categoryService) {
+    public CategoryController(ICategoryService categoryService) {
         this.categoryService = categoryService;
     }
 
