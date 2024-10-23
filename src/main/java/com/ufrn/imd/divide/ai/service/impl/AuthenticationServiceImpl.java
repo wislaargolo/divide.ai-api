@@ -36,7 +36,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 )
         );
 
-        User user = userRepository.findByEmailIgnoreCase(request.email())
+        User user = userRepository.findByEmailIgnoreCaseAndActiveTrue(request.email())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
 
         String token = jwtService.generateToken(new UserDetailsImpl(user));

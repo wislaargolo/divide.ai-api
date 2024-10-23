@@ -8,9 +8,11 @@ import com.ufrn.imd.divide.ai.mapper.UserMapper;
 import com.ufrn.imd.divide.ai.model.User;
 import com.ufrn.imd.divide.ai.repository.UserRepository;
 import com.ufrn.imd.divide.ai.exception.BusinessException;
+import com.ufrn.imd.divide.ai.service.GroupService;
 import com.ufrn.imd.divide.ai.service.UserService;
 import com.ufrn.imd.divide.ai.service.UserValidationService;
 import com.ufrn.imd.divide.ai.util.AttributeUtils;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,21 +27,27 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     private final UserValidationService userValidationService;
+    private final GroupService groupService;
 
     public UserServiceImpl(UserRepository userRepository,
                            PasswordEncoder passwordEncoder,
                            UserMapper userMapper,
-                           UserValidationService userValidationService) {
+                           UserValidationService userValidationService,
+                           GroupService groupService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
         this.userValidationService = userValidationService;
+        this.groupService = groupService;
     }
 
+    @Transactional
     @Override
     public void delete(Long userId) {
         userValidationService.validateUser(userId);
         User user = findById(userId);
+
+        groupService.validateAndUpdateGroupsForUserDeletion(user);
 
         user.setActive(false);
         userRepository.save(user);
@@ -65,7 +73,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findById(Long userId) {
-        return userRepository.findById(userId)
+        return userRepository.findByIdAndActiveTrue(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Usuário de ID " + userId + " não encontrado."
                 ));
@@ -82,7 +90,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private void validateEmail(String email, Long id) {
-        Optional<User> user = userRepository.findByEmailIgnoreCase(email);
+        Optional<User> user = userRepository.findByEmailIgnoreCaseAndActiveTrue(email);
         if (user.isPresent() && (id == null || !user.get().getId().equals(id))) {
             throw new BusinessException(
                     "E-mail inválido: " + email + ". Um usuário cadastrado já utiliza este e-mail.",
@@ -92,7 +100,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private void validatePhoneNumber(String phone, Long id) {
-        Optional<User> user = userRepository.findByPhoneNumber(phone);
+        Optional<User> user = userRepository.findByPhoneNumberAndActiveTrue(phone);
         if (user.isPresent() && (id == null || !user.get().getId().equals(id))) {
             throw new BusinessException(
                     "Número de telefone inválido: " + phone + ". Um usuário cadastrado já utiliza este número de telefone.",

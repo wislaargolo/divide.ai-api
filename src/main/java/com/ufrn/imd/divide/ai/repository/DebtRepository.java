@@ -11,6 +11,6 @@ import java.util.List;
 @Repository
 public interface DebtRepository extends JpaRepository<Debt, Long> {
 
-    List<Debt> findByUserAndGroupTransaction_GroupAndPaidAtIsNull(User user, Group group);
+    boolean existsByUserAndGroupTransactionGroupAndPaidAtIsNull(User user, Group group);
 
 }

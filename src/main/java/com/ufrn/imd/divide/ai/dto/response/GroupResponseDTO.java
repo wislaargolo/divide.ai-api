@@ -12,6 +12,7 @@ public record GroupResponseDTO(
         String description,
         String code,
         List<UserResponseDTO> members,
-        UserResponseDTO createdBy
+        UserResponseDTO createdBy,
+        boolean discontinued
 ) {
 }

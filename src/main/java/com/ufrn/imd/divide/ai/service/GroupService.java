@@ -30,6 +30,6 @@ public interface GroupService {
 
     GroupResponseDTO leaveGroup(Long groupId, Long userId);
 
-    GroupResponseDTO deleteUserFromGroup(Group group, User user);
+    void validateAndUpdateGroupsForUserDeletion(User user);
 
 }

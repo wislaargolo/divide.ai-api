@@ -12,10 +12,14 @@ import com.ufrn.imd.divide.ai.model.Group;
 import com.ufrn.imd.divide.ai.model.User;
 import com.ufrn.imd.divide.ai.repository.DebtRepository;
 import com.ufrn.imd.divide.ai.repository.GroupRepository;
+import com.ufrn.imd.divide.ai.repository.UserRepository;
 import com.ufrn.imd.divide.ai.service.GroupService;
 import com.ufrn.imd.divide.ai.service.UserService;
 import com.ufrn.imd.divide.ai.service.UserValidationService;
 import com.ufrn.imd.divide.ai.util.AttributeUtils;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+import org.hibernate.Session;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -31,18 +35,19 @@ public class GroupServiceImpl implements GroupService {
 
     private final GroupRepository groupRepository;
     private final GroupMapper groupMapper;
-    private final UserService userService;
+    private final UserRepository userRepository;
     private final DebtRepository debtRepository;
     private final UserValidationService userValidationService;
 
 
     public GroupServiceImpl(GroupRepository groupRepository,
                             GroupMapper groupMapper,
-                            UserService userService, DebtRepository debtRepository,
+                            UserRepository userRepository,
+                            DebtRepository debtRepository,
                             UserValidationService userValidationService) {
         this.groupRepository = groupRepository;
         this.groupMapper = groupMapper;
-        this.userService = userService;
+        this.userRepository = userRepository;
         this.debtRepository = debtRepository;
         this.userValidationService = userValidationService;
     }
@@ -50,15 +55,17 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void delete(Long groupId) {
         Group group = findByIdIfExists(groupId);
-        userValidationService.validateUser(group.getCreatedBy().getId(), "Apenas o dono do grupo pode removê-lo.");
+        userValidationService.validateUser(group.getCreatedBy().getId(),
+                                "Apenas o dono do grupo pode removê-lo.");
         group.setActive(false);
         groupRepository.save(group);
     }
 
     @Override
+    @Transactional
     public GroupResponseDTO save(GroupCreateRequestDTO dto) {
 
-        validateBeforeSave(dto.createdBy(), dto.name(), null);
+        validateBeforeSave(dto.createdBy());
 
         Group group = groupMapper.toEntity(dto);
 
@@ -75,24 +82,26 @@ public class GroupServiceImpl implements GroupService {
     public GroupResponseDTO update(Long groupId, GroupUpdateRequestDTO dto) {
         Group group = findByIdIfExists(groupId);
 
-        validateBeforeSave(group.getCreatedBy().getId(), dto.name(), groupId);
+        validateBeforeSave(group.getCreatedBy().getId());
         BeanUtils.copyProperties(dto, group, AttributeUtils.getNullOrBlankPropertyNames(dto));
 
         return groupMapper.toDto(groupRepository.save(group));
     }
 
-    private void validateBeforeSave(Long createdBy, String name, Long groupId) {
+    private void validateBeforeSave(Long createdBy) {
+        findUserById(createdBy);
         userValidationService.validateUser(createdBy);
-        userService.findById(createdBy);
     }
 
     @Override
     public List<GroupResponseDTO> findAllByUserId(Long userId) {
-        userService.findById(userId);
-        List<Group> groups = groupRepository.findByMembers_Id(userId);
-        return groups.stream()
-                .map(groupMapper::toDto)
+        findUserById(userId);
+        List<Group> groups = groupRepository.findByMembersId(userId);
+
+        return groups.
+                stream().map(groupMapper::toDto)
                 .collect(Collectors.toList());
+
     }
 
     @Override
@@ -112,9 +121,10 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public GroupResponseDTO joinGroupByCode(JoinGroupRequestDTO dto) {
         Group group = findByCodeIfExists(dto.code());
-        validateBeforeJoin(group, dto.userId());
+        User user = findUserById(dto.userId());
 
-        User user = userService.findById(dto.userId());
+        validateBeforeJoin(group, user);
+
         group.getMembers().add(user);
 
         return groupMapper.toDto(groupRepository.save(group));
@@ -128,8 +138,14 @@ public class GroupServiceImpl implements GroupService {
                 ));
     }
 
-    private void validateBeforeJoin(Group group, Long userId) {
-        User user = userService.findById(userId);
+    private void validateBeforeJoin(Group group, User user) {
+        if(group.isDiscontinued()) {
+            throw new BusinessException(
+                    "O grupo não aceita mais membros, foi descontinuado.",
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
         if (group.getMembers().contains(user)) {
             throw new BusinessException(
                     "Este usuário já é membro do grupo.",
@@ -142,54 +158,92 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public GroupResponseDTO deleteMember(Long groupId, Long userId) {
         Group group = findByIdIfExists(groupId);
-        User user = userService.findById(userId);
-        userValidationService.validateUser(
-                group.getCreatedBy().getId(),
-                "Apenas o dono do grupo pode remover um membro.");
-
-        return deleteUserFromGroup(group, user);
-    }
-
-    @Override
-    public GroupResponseDTO leaveGroup(Long groupId, Long userId) {
-        Group group = findByIdIfExists(groupId);
-        User user = userService.findById(userId);
-        userValidationService.validateUser(userId);
-
-        return deleteUserFromGroup(group, user);
-    }
-
-    @Override
-    public GroupResponseDTO deleteUserFromGroup(Group group, User user) {
+        User user = findUserById(userId);
         validateBeforeDelete(group, user);
 
         group.getMembers().remove(user);
         return groupMapper.toDto(groupRepository.save(group));
     }
 
-    private void validateBeforeDelete(Group group, User user) {
+    @Override
+    public GroupResponseDTO leaveGroup(Long groupId, Long userId) {
+        Group group = findByIdIfExists(groupId);
+        User user = findUserById(userId);
+        validateBeforeLeave(group, user);
 
+        group.getMembers().remove(user);
+        return groupMapper.toDto(groupRepository.save(group));
+    }
+
+    private void validateBeforeDelete(Group group, User user) {
+        userValidationService.validateUser(
+                group.getCreatedBy().getId(),
+                "Apenas o dono do grupo pode remover um membro.");
+
+        validateUserRemoval(group, user);
+
+    }
+
+    private void validateBeforeLeave(Group group, User user) {
+        userValidationService.validateUser(user.getId());
+        validateUserRemoval(group, user);
+    }
+
+    private void validateUserRemoval(Group group, User user) {
+       validateGroupOwner(group, user);
+       validateUserMemberOfGroup(group, user);
+       validateUserDebts(group, user);
+    }
+
+    private void validateGroupOwner(Group group, User user) {
         if (group.getCreatedBy().equals(user)) {
             throw new BusinessException(
-                    "O dono do grupo não pode sair. Ao invés disso, remova o grupo.",
+                    "O proprietário do grupo não pode sair ou ser removido. " +
+                            "Para encerrar o grupo, é necessário excluí-lo.",
                     HttpStatus.BAD_REQUEST
             );
         }
+    }
 
+    private void validateUserMemberOfGroup(Group group, User user) {
         if (!group.getMembers().contains(user)) {
             throw new BusinessException(
-                    "O usuário não é membro deste grupo.",
+                    "O usuário não faz parte deste grupo.",
                     HttpStatus.BAD_REQUEST
             );
         }
+    }
 
-        List<Debt> unpaidDebts = debtRepository.findByUserAndGroupTransaction_GroupAndPaidAtIsNull(user, group);
-        if (!unpaidDebts.isEmpty()) {
+    private void validateUserDebts(Group group, User user) {
+        if (debtRepository.existsByUserAndGroupTransactionGroupAndPaidAtIsNull(user, group)) {
             throw new BusinessException(
-                    "O usuário possúi débitos não quitados e por isso não pode sair do grupo.",
+                    "O usuário possui pendências financeiras no grupo " + group.getName() +
+                            " e não pode sair ou ser removido até que elas sejam quitadas.",
                     HttpStatus.BAD_REQUEST
             );
         }
+    }
+
+    @Override
+    public void validateAndUpdateGroupsForUserDeletion(User user) {
+        List<Group> groups = groupRepository.findByMembersId(user.getId());
+
+        for (Group group : groups) {
+            validateUserDebts(group, user);
+
+            if(group.getCreatedBy().equals(user)) {
+                group.getMembers().remove(user);
+                group.setDiscontinued(true);
+                groupRepository.save(group);
+            }
+        }
+    }
+
+    private User findUserById(Long userId) {
+        return userRepository.findByIdAndActiveTrue(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Usuário de ID " + userId + " não encontrado."
+                ));
     }
 
     private String generateUniqueCode() {

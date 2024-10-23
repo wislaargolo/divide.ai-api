@@ -13,5 +13,4 @@ public interface UserService {
     UserResponseDTO save(UserCreateRequestDTO dto);
 
     User findById(Long userId);
-
 }
