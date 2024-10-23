@@ -7,5 +7,6 @@ public record UserTransactionUpdateRequestDTO(
         String description,
         Long categoryId,
         LocalDateTime paidAt
+
 ) {
 }

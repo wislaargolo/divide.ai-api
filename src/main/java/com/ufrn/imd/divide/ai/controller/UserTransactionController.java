@@ -81,7 +81,6 @@ public class UserTransactionController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponseDTO<UserTransactionResponseDTO>> findById(@PathVariable Long id) {
         UserTransactionResponseDTO transactionResponse = userTransactionService.findById(id);
-
         ApiResponseDTO<UserTransactionResponseDTO> response = new ApiResponseDTO<>(
                 true,
                 "Transação recuperada com sucesso.",

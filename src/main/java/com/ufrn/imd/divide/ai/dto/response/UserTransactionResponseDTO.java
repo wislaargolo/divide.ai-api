@@ -8,7 +8,7 @@ public record UserTransactionResponseDTO(
         Long id,
         Double amount,
         String description,
-        CategoryRequestDTO category,
+        CategoryResponseDTO category,
         LocalDateTime paidAt
 ) {
 }

@@ -8,6 +8,7 @@ import com.ufrn.imd.divide.ai.mapper.UserTransactionMapper;
 import com.ufrn.imd.divide.ai.model.Category;
 import com.ufrn.imd.divide.ai.model.User;
 import com.ufrn.imd.divide.ai.model.UserTransaction;
+import com.ufrn.imd.divide.ai.repository.CategoryRepository;
 import com.ufrn.imd.divide.ai.repository.UserTransactionRepository;
 import com.ufrn.imd.divide.ai.service.CategoryService;
 import com.ufrn.imd.divide.ai.service.UserService;
@@ -28,18 +29,19 @@ public class UserTransactionServiceImpl implements UserTransactionService {
     private final UserService userService;
     private final CategoryService categoryService;
     private final UserValidationService userValidationService;
-
+    private final CategoryRepository categoryRepository;
 
     public UserTransactionServiceImpl(UserTransactionRepository userTransactionRepository,
                                       UserTransactionMapper userTransactionMapper,
                                       UserService userService,
                                       CategoryService categoryService,
-                                      UserValidationService userValidationService) {
+                                      UserValidationService userValidationService, CategoryRepository categoryRepository) {
         this.userTransactionRepository = userTransactionRepository;
         this.userTransactionMapper = userTransactionMapper;
         this.userService = userService;
         this.categoryService = categoryService;
         this.userValidationService = userValidationService;
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
@@ -48,12 +50,12 @@ public class UserTransactionServiceImpl implements UserTransactionService {
         User user = userService.findById(dto.userId());
         Category category = categoryService.getCategoryByIdIfExists(dto.categoryId());
 
+
         UserTransaction userTransaction = userTransactionMapper.toEntity(dto);
         userTransaction.setUser(user);
         userTransaction.setCategory(category);
         if (category.getExpense()){
             userTransaction.setAmount(-dto.amount());
-
         }
 
         return userTransactionMapper.toDto(userTransactionRepository.save(userTransaction));
@@ -74,11 +76,21 @@ public class UserTransactionServiceImpl implements UserTransactionService {
     public UserTransactionResponseDTO update(Long transactionId,
                                              UserTransactionUpdateRequestDTO dto) {
         UserTransaction userTransaction = findByIdIfExists(transactionId);
-        userValidationService.validateUser(userTransaction.getUser().getId(), "Apenas o dono da transação pode atualiza-la.");
+        Category category = categoryService.getCategoryByIdIfExists(dto.categoryId());
+        userTransaction.setCategory(category);
+        userValidationService.validateUser(userTransaction.getUser().getId(), "Apenas o dono da transação pode atualizá-la.");
+
+        if (dto.paidAt() == null) {
+            userTransaction.setPaidAt(null);
+        }
 
         BeanUtils.copyProperties(dto, userTransaction, AttributeUtils.getNullOrBlankPropertyNames(dto));
+        if (category.getExpense()){
+            userTransaction.setAmount(-dto.amount());
+        }
         return userTransactionMapper.toDto(userTransactionRepository.save(userTransaction));
     }
+
 
     @Override
     public void delete(Long transactionId) {
