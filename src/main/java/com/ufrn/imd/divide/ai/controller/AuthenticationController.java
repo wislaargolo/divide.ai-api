@@ -26,7 +26,7 @@ public class AuthenticationController {
             @Valid @RequestBody AuthRequestDTO request) {
         ApiResponseDTO<AuthResponseDTO> response = new ApiResponseDTO<>(
                 true,
-                "Authentication completed successfully",
+                "Autenticação realizada com sucesso.",
                 authenticationService.authenticate(request),
                 null);
 

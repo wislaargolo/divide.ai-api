@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
@@ -32,7 +31,7 @@ public class ControllerExceptionHandler {
 
         ApiResponseDTO<ErrorResponseDTO> response = new ApiResponseDTO<>(
                 false,
-                "Resource not found",
+                "Recurso não encontrado.",
                 null,
                 errorResponse
         );
@@ -47,13 +46,13 @@ public class ControllerExceptionHandler {
         ErrorResponseDTO errorResponse = new ErrorResponseDTO(
                 ZonedDateTime.now(),
                 exception.getHttpStatusCode().value(),
-                "Business error",
+                "Erro de negócio.",
                 exception.getMessage(),
                 request.getDescription(false));
 
         ApiResponseDTO<ErrorResponseDTO> response = new ApiResponseDTO<>(
                 false,
-                "Business validation failed",
+                "Falha na validação de negócio.",
                 null,
                 errorResponse
         );
@@ -74,7 +73,7 @@ public class ControllerExceptionHandler {
 
         ApiResponseDTO<ErrorResponseDTO> response = new ApiResponseDTO<>(
                 false,
-                "Invalid credentials",
+                "Credenciais inválidas.",
                 null,
                 errorResponse
         );
@@ -93,7 +92,7 @@ public class ControllerExceptionHandler {
 
         ApiResponseDTO<ErrorResponseDTO> response = new ApiResponseDTO<>(
                 false,
-                "Token expired",
+                "Token expirado.",
                 null,
                 errorResponse
         );
@@ -119,7 +118,7 @@ public class ControllerExceptionHandler {
 
         ApiResponseDTO<ErrorResponseDTO> response = new ApiResponseDTO<>(
                 false,
-                "Validation error",
+                "Erro de validação.",
                 null,
                 errorResponse
         );
@@ -140,7 +139,7 @@ public class ControllerExceptionHandler {
 
         ApiResponseDTO<ErrorResponseDTO> response = new ApiResponseDTO<>(
                 false,
-                "Forbidden error",
+                "Acesso proibido.",
                 null,
                 errorResponse
         );
@@ -159,7 +158,7 @@ public class ControllerExceptionHandler {
 
         ApiResponseDTO<ErrorResponseDTO> response = new ApiResponseDTO<>(
                 false,
-                "Internal server error",
+                "Erro interno de servidor.",
                 null,
                 errorResponse
         );

@@ -25,7 +25,7 @@ public class UserController {
         userService.delete(id);
         ApiResponseDTO<?> response = new ApiResponseDTO<>(
                 true,
-                "User deleted successfully",
+                "Usuário removido com sucesso.",
                 null,
                 null
         );
@@ -39,7 +39,7 @@ public class UserController {
 
         ApiResponseDTO<UserResponseDTO> response = new ApiResponseDTO<>(
                 true,
-                "User updated successfully.",
+                "Usuário atualizado com sucesso.",
                 userService.update(dto, id),
                 null
         );
@@ -52,7 +52,7 @@ public class UserController {
 
         ApiResponseDTO<UserResponseDTO> response = new ApiResponseDTO<>(
                 true,
-                "User created successfully.",
+                "Usuário criado com sucesso.",
                 userService.save(dto),
                 null
         );

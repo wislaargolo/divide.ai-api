@@ -29,7 +29,7 @@ public class CategoryController {
         System.out.println("depois do service" + newCategory);
         ApiResponseDTO<CategoryResponseDTO> response = new ApiResponseDTO<>(
                 true,
-                "Category created successfully.",
+                "Categoria criada com sucesso.",
                 newCategory,
                 null
         );
@@ -43,7 +43,7 @@ public class CategoryController {
 
         ApiResponseDTO<List<CategoryResponseDTO>> response = new ApiResponseDTO<>(
                 true,
-                "Categories retrieved successfully.",
+                "Categorias retornadas com sucesso.",
                 categories,
                 null
         );
@@ -72,7 +72,7 @@ public class CategoryController {
 
         ApiResponseDTO<List<CategoryResponseDTO>> response = new ApiResponseDTO<>(
                 true,
-                "Categories retrieved successfully.",
+                "Categorias retornadas com sucesso.",
                 categories,
                 null
         );
@@ -87,13 +87,13 @@ public class CategoryController {
 
         CategoryResponseDTO updatedCategory = categoryService.updateCategory(id, categoryDetails);
 
-        ApiResponseDTO<CategoryResponseDTO> response = new ApiResponseDTO<>(
-                true,
-                "Category updated successfully.",
-                updatedCategory,
-                null
-        );
-        return ResponseEntity.ok(response);
+         ApiResponseDTO<CategoryResponseDTO> response = new ApiResponseDTO<>(
+                 true,
+                 "Categoria atualizada com sucesso.",
+                 updatedCategory,
+                 null
+         );
+         return ResponseEntity.ok(response);
 
 //                .orElseGet(() -> {
 //                    ApiResponseDTO<CategoryDTO> response = new ApiResponseDTO<>(
@@ -112,7 +112,7 @@ public class CategoryController {
 
         ApiResponseDTO<Void> response = new ApiResponseDTO<>(
                 true,
-                "Category deleted successfully",
+                "Categoria removida com sucesso.",
                 null,
                 null
         );

@@ -1,6 +1,8 @@
 package com.ufrn.imd.divide.ai.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
@@ -30,6 +32,8 @@ public class Group extends BaseEntity {
 
     @Column(nullable = false)
     private String code;
+
+    private boolean discontinued = false;
 
     public String getName() {
         return name;
@@ -69,5 +73,13 @@ public class Group extends BaseEntity {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public boolean isDiscontinued() {
+        return discontinued;
+    }
+
+    public void setDiscontinued(boolean discontinued) {
+        this.discontinued = discontinued;
     }
 }
