@@ -3,7 +3,7 @@ package com.ufrn.imd.divide.ai.controller;
 import com.ufrn.imd.divide.ai.dto.request.AuthRequestDTO;
 import com.ufrn.imd.divide.ai.dto.response.ApiResponseDTO;
 import com.ufrn.imd.divide.ai.dto.response.AuthResponseDTO;
-import com.ufrn.imd.divide.ai.service.AuthenticationService;
+import com.ufrn.imd.divide.ai.service.interfaces.IAuthenticationService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 public class AuthenticationController {
 
-    private final AuthenticationService authenticationService;
+    private final IAuthenticationService authenticationService;
 
-    public AuthenticationController(AuthenticationService authenticationService) {
+    public AuthenticationController(IAuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
     }
 

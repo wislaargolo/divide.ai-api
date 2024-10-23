@@ -3,7 +3,6 @@ package com.ufrn.imd.divide.ai.controller;
 import com.ufrn.imd.divide.ai.dto.request.OpenAIRequestDTO;
 import com.ufrn.imd.divide.ai.dto.response.ApiResponseDTO;
 import com.ufrn.imd.divide.ai.dto.response.OpenAIResponseDTO;
-import com.ufrn.imd.divide.ai.service.AuthenticationService;
 import com.ufrn.imd.divide.ai.service.interfaces.IOpenAIService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

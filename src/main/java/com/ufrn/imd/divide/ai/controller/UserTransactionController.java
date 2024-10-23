@@ -4,7 +4,7 @@ import com.ufrn.imd.divide.ai.dto.request.UserTransactionCreateRequestDTO;
 import com.ufrn.imd.divide.ai.dto.request.UserTransactionUpdateRequestDTO;
 import com.ufrn.imd.divide.ai.dto.response.ApiResponseDTO;
 import com.ufrn.imd.divide.ai.dto.response.UserTransactionResponseDTO;
-import com.ufrn.imd.divide.ai.service.UserTransactionService;
+import com.ufrn.imd.divide.ai.service.interfaces.IUserTransactionService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +17,9 @@ import java.util.List;
 @RequestMapping("/user-transactions")
 public class UserTransactionController {
 
-    private final UserTransactionService userTransactionService;
+    private final IUserTransactionService userTransactionService;
 
-    public UserTransactionController(UserTransactionService userTransactionService) {
+    public UserTransactionController(IUserTransactionService userTransactionService) {
         this.userTransactionService = userTransactionService;
     }
 

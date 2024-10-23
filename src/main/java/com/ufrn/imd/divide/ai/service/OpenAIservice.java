@@ -8,6 +8,7 @@ import com.azure.ai.openai.models.ChatRequestUserMessage;
 import com.ufrn.imd.divide.ai.dto.request.OpenAIRequestDTO;
 import com.ufrn.imd.divide.ai.dto.response.OpenAIResponseDTO;
 import com.ufrn.imd.divide.ai.exception.BusinessException;
+import com.ufrn.imd.divide.ai.exception.ResourceNotFoundException;
 import com.ufrn.imd.divide.ai.mapper.ChatMapper;
 import com.ufrn.imd.divide.ai.model.Chat;
 import com.ufrn.imd.divide.ai.model.User;
@@ -15,6 +16,7 @@ import com.ufrn.imd.divide.ai.repository.OpenAIRepository;
 import com.ufrn.imd.divide.ai.repository.UserRepository;
 import com.ufrn.imd.divide.ai.service.interfaces.IOpenAIService;
 
+import com.ufrn.imd.divide.ai.service.interfaces.IUserService;
 import com.ufrn.imd.divide.ai.util.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -28,7 +30,8 @@ public class OpenAIservice implements IOpenAIService {
     private OpenAIClient openAIClient;
     private final ChatMapper chatMapper;
     private OpenAIRepository openAIRepository;
-    private UserRepository userRepository;
+    private final IUserService userService;
+
     @Value("${openai.model}")
     private String model;
 
@@ -37,11 +40,14 @@ public class OpenAIservice implements IOpenAIService {
 
     private static final String SYSTEM_PROMPT_FILE_PATH = "prompt/SystemPrompt.txt";
 
-    public OpenAIservice(OpenAIClient openAIClient, ChatMapper chatMapper, OpenAIRepository openAIRepository, UserRepository userRepository) {
+    public OpenAIservice(OpenAIClient openAIClient,
+                         ChatMapper chatMapper,
+                         OpenAIRepository openAIRepository,
+                         IUserService userService) {
         this.openAIClient = openAIClient;
         this.chatMapper = chatMapper;
         this.openAIRepository = openAIRepository;
-        this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     @Override
@@ -50,8 +56,7 @@ public class OpenAIservice implements IOpenAIService {
         String prompt = chatRequestDTO.prompt();
 
         List<ChatRequestMessage> chatMessages = buildChatMessages(chatRequestDTO.prompt());
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new Error("Usuário com ID '" + userId + "' não encontrado."));
+        User user = userService.findById(userId);
 
         ChatCompletionsOptions options = new ChatCompletionsOptions(chatMessages)
                 .setTemperature(temperature);

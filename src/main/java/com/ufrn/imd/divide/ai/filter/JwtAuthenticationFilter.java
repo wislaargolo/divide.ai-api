@@ -1,7 +1,6 @@
 package com.ufrn.imd.divide.ai.filter;
 
-import com.ufrn.imd.divide.ai.service.JwtService;
-import com.ufrn.imd.divide.ai.service.impl.UserDetailsServiceImpl;
+import com.ufrn.imd.divide.ai.service.interfaces.IJwtService;
 import com.ufrn.imd.divide.ai.util.EndpointChecker;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -25,16 +24,16 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;
+    private final IJwtService IJwtService;
     private final UserDetailsService userDetailsService;
     private final HandlerExceptionResolver handlerExceptionResolver;
     private final EndpointChecker endpointChecker;
 
-    public JwtAuthenticationFilter(JwtService jwtService,
+    public JwtAuthenticationFilter(IJwtService IJwtService,
                                    UserDetailsService userDetailsService,
                                    HandlerExceptionResolver handlerExceptionResolver,
                                    EndpointChecker endpointChecker) {
-        this.jwtService = jwtService;
+        this.IJwtService = IJwtService;
         this.userDetailsService = userDetailsService;
         this.handlerExceptionResolver = handlerExceptionResolver;
         this.endpointChecker = endpointChecker;
@@ -67,13 +66,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
 
-            String username = jwtService.extractUsername(token);
+            String username = IJwtService.extractUsername(token);
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                if (jwtService.isValid(token, userDetails)) {
+                if (IJwtService.isValid(token, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities()
                     );

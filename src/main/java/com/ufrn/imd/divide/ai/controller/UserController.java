@@ -4,7 +4,7 @@ import com.ufrn.imd.divide.ai.dto.request.UserCreateRequestDTO;
 import com.ufrn.imd.divide.ai.dto.request.UserUpdateRequestDTO;
 import com.ufrn.imd.divide.ai.dto.response.ApiResponseDTO;
 import com.ufrn.imd.divide.ai.dto.response.UserResponseDTO;
-import com.ufrn.imd.divide.ai.service.UserService;
+import com.ufrn.imd.divide.ai.service.interfaces.IUserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/users")
 public class UserController {
 
-    private final UserService userService;
+    private final IUserService userService;
 
-    public UserController(UserService userService) {
+    public UserController(IUserService userService) {
         this.userService = userService;
     }
 

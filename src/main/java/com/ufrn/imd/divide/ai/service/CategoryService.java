@@ -2,28 +2,138 @@ package com.ufrn.imd.divide.ai.service;
 
 import com.ufrn.imd.divide.ai.dto.request.CategoryRequestDTO;
 import com.ufrn.imd.divide.ai.dto.response.CategoryResponseDTO;
+import com.ufrn.imd.divide.ai.exception.BusinessException;
+import com.ufrn.imd.divide.ai.exception.ResourceNotFoundException;
+import com.ufrn.imd.divide.ai.mapper.CategoryMapper;
 import com.ufrn.imd.divide.ai.model.Category;
+import com.ufrn.imd.divide.ai.model.User;
+import com.ufrn.imd.divide.ai.repository.CategoryRepository;
+import com.ufrn.imd.divide.ai.service.interfaces.ICategoryService;
+import com.ufrn.imd.divide.ai.util.AttributeUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.http.HttpStatus;
+import com.ufrn.imd.divide.ai.repository.UserRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-public interface CategoryService {
-    CategoryResponseDTO saveCategory(CategoryRequestDTO category);
+@Service
+public class CategoryService implements ICategoryService {
 
-    List<CategoryResponseDTO> getCategoriesBySubstring(String name);
+    private final CategoryMapper categoryMapper;
+    private final CategoryRepository categoryRepository;
+    private final UserRepository userRepository;
 
-    List<CategoryResponseDTO> getAllCategories();
+    public CategoryService(CategoryMapper categoryMapper, CategoryRepository categoryRepository, UserRepository userRepository) {
+        this.categoryMapper = categoryMapper;
+        this.categoryRepository = categoryRepository;
+        this.userRepository = userRepository;
+    }
 
-    List<CategoryResponseDTO> getCategoriesByUserId(Long userId);
+    @Override
+    public CategoryResponseDTO saveCategory(CategoryRequestDTO category) {
+        List<Category> existingCategory = categoryRepository.findByName(category.name());
 
-    List<CategoryResponseDTO> getCategoriesByUserType(Long userId, boolean type);
+        if (!existingCategory.isEmpty()) {
+            throw new BusinessException(
+                    "Categoria com o nome '" + category.name() + "' já existe.", HttpStatus.BAD_REQUEST
+            );
+        }
+        User user = userRepository.findById(category.userId())
+                .orElseThrow(() -> new Error("Usuário com ID '" + category.userId() + "' não encontrado."));
+        if (category.expense() == null) {
+            throw new BusinessException("O campo 'isExpense' não pode ser nulo.", HttpStatus.BAD_REQUEST);
+        }
+        Category c = categoryMapper.toEntity(category);
+        c.setUser(user);
+        return categoryMapper.toDto(categoryRepository.save(c));
+    }
 
-    CategoryResponseDTO getCategoryById(Long id);
+    @Override
+    public List<CategoryResponseDTO> getCategoriesBySubstring(String name) {
 
-    Category getCategoryByIdIfExists(Long id);
+        List<Category> categories = categoryRepository
+                .findByNameContainingIgnoreCase(name);
 
-    CategoryResponseDTO updateCategory(Long id, CategoryRequestDTO categoryDetails);
+        if (categories.isEmpty()) {
+            throw new ResourceNotFoundException("Não foram encontradas categorias com o nome: " + name);
+        }
 
-    List<CategoryResponseDTO> getCategoryByName(String name);
+        return categories.stream()
+                .map(categoryMapper::toDto)
+                .collect(Collectors.toList());
+    }
 
-    void deleteCategory(Long id);
+    @Override
+    public List<CategoryResponseDTO> getAllCategories() {
+        return categoryRepository
+                .findAll()
+                .stream()
+                .map(categoryMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CategoryResponseDTO> getCategoriesByUserId(Long userId) {
+        List<Category> categories = categoryRepository.findByUserId(userId);
+
+        return categories.stream()
+                .map(categoryMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CategoryResponseDTO> getCategoriesByUserType(Long userId, boolean type) {
+        List<Category> categories = categoryRepository.findByUserIdAndExpense(userId, type);
+
+        return categories.stream()
+                .map(categoryMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public CategoryResponseDTO getCategoryById(Long id) {
+        Category category = getCategoryByIdIfExists(id);
+        return categoryMapper.toDto(category);
+    }
+
+    @Override
+    public Category getCategoryByIdIfExists(Long id) {
+        Optional<Category> category =  categoryRepository.findById(id);
+        if (category.isPresent()){
+            return category.get();
+
+        }
+        throw new ResourceNotFoundException("Categoria não encontrada.");
+    }
+
+    @Override
+    public CategoryResponseDTO updateCategory(Long id, CategoryRequestDTO categoryDetails) {
+        Optional<Category> c =  categoryRepository.findById(id);
+        if (c.isPresent()){
+            Category category = c.get();
+            BeanUtils.copyProperties(categoryDetails, category, AttributeUtils.getNullOrBlankPropertyNames(categoryDetails));
+            return categoryMapper.toDto(categoryRepository.save(category));
+        }
+        throw new ResourceNotFoundException("Categoria não encontrada.");
+    }
+
+    @Override
+    public List<CategoryResponseDTO> getCategoryByName(String name) {
+        return categoryRepository.findByName(name)
+                .stream()
+                .map(categoryMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteCategory(Long id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada."));
+
+        category.setActive(false);
+        categoryRepository.save(category);
+    }
 }
