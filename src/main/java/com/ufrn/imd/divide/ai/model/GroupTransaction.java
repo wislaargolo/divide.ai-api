@@ -15,7 +15,7 @@ public class GroupTransaction extends Transaction {
     @JoinColumn(name = "group_id", nullable = false)
     private Group group;
 
-    @OneToMany(mappedBy="groupTransaction")
+    @OneToMany(mappedBy="groupTransaction", cascade = CascadeType.REMOVE)
     @JsonManagedReference
     private List<Debt> debts;
 

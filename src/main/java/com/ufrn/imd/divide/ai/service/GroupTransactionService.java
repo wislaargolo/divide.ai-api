@@ -34,12 +34,12 @@ public class GroupTransactionService implements IGroupTransactionService {
     private final DebtMapper debtMapper;
 
     public GroupTransactionService(GroupTransactionRepository groupTransactionRepository,
-                                   IUserService userService,
-                                   IGroupService groupService,
-                                   GroupTransactionMapper groupTransactionMapper,
-                                   IUserValidationService userValidationService,
-                                   IDebtService debtService,
-                                   DebtMapper debtMapper) {
+            IUserService userService,
+            IGroupService groupService,
+            GroupTransactionMapper groupTransactionMapper,
+            IUserValidationService userValidationService,
+            IDebtService debtService,
+            DebtMapper debtMapper) {
         this.groupTransactionRepository = groupTransactionRepository;
         this.userService = userService;
         this.groupService = groupService;
@@ -95,9 +95,31 @@ public class GroupTransactionService implements IGroupTransactionService {
 
     }
 
+    @Transactional
+    public List<GroupTransactionResponseDTO> findAll(Long groupId) {
+        Group group = groupService.findByIdIfExists(groupId);
+        List<GroupTransaction> groupTransactions = groupTransactionRepository.findByGroupId(group.getId());
+        return groupTransactions.stream()
+                .map(groupTransactionMapper::toDTO)
+                .toList();
+    }
+
+    @Transactional
+    public String delete(Long groupId, Long transactionId) {
+        Group group = groupService.findByIdIfExists(groupId);
+        GroupTransaction groupTransaction = findByIdIfExists(transactionId);
+
+        if (!groupTransaction.getGroup().getId().equals(group.getId())) {
+            throw new ResourceNotFoundException(
+                    "Despesa de grupo com id " + transactionId + " não encontrada para o grupo com id " + groupId);
+        }
+        groupTransactionRepository.delete(groupTransaction);
+
+        return "Despesa de grupo com id " + transactionId + " deletada com sucesso.";
+    }
 
     private void validateBeforeUpdate(GroupTransactionUpdateRequestDTO dto,
-                                      GroupTransaction groupTransaction) {
+            GroupTransaction groupTransaction) {
         userValidationService.validateUser(
                 groupTransaction.getCreatedBy().getId(),
                 "Apenas o dono da despesa em grupo pode remover um membro.");
@@ -115,8 +137,7 @@ public class GroupTransactionService implements IGroupTransactionService {
         if (!totalDebts.equals(dto)) {
             throw new BusinessException(
                     "A soma dos valores das dívidas deve ser igual ao total da transação do grupo.",
-                    HttpStatus.BAD_REQUEST
-            );
+                    HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -125,7 +146,7 @@ public class GroupTransactionService implements IGroupTransactionService {
         Set<Debt> debts = new HashSet<>(databaseDebts);
         Set<Debt> updatedDebts = new HashSet<>(dtoDebts.stream().map(debtMapper::toEntity).toList());
 
-        if(!debts.equals(updatedDebts)){
+        if (!debts.equals(updatedDebts)) {
             throw new BusinessException(
                     "A lista de dívidas da transação não corresponde a lista original",
                     HttpStatus.BAD_REQUEST);
@@ -134,10 +155,6 @@ public class GroupTransactionService implements IGroupTransactionService {
 
     private GroupTransaction findByIdIfExists(Long id) {
         return groupTransactionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(
-                "Despesa de grupo com id " + id + " não encontrado."
-        ));
+                "Despesa de grupo com id " + id + " não encontrado."));
     }
-
-
 }
-
