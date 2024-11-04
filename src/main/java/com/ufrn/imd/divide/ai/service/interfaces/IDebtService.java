@@ -12,4 +12,6 @@ public interface IDebtService {
     List<Debt> saveDebts(GroupTransactionCreateRequestDTO dto, GroupTransaction savedGroupTransaction);
 
     List<Debt> updateDebts(GroupTransactionUpdateRequestDTO dto);
+
+    Debt findById(Long id);
 }

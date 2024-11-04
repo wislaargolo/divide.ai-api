@@ -71,6 +71,7 @@ public class DebtService implements IDebtService {
         }
     }
 
+    @Override
     public Debt findById(Long id) {
         return debtRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
