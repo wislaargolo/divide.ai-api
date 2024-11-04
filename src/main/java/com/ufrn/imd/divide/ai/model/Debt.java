@@ -12,11 +12,11 @@ import java.time.LocalDateTime;
 public class Debt extends BaseEntity {
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(nullable = false, updatable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
+    @JoinColumn(nullable = false, updatable = false)
     @JsonBackReference
     private GroupTransaction groupTransaction;
 
@@ -24,6 +24,13 @@ public class Debt extends BaseEntity {
     private Double amount;
 
     private LocalDateTime paidAt;
+
+    public Debt() {
+    }
+
+    public Debt(Long id) {
+        super(id);
+    }
 
     public User getUser() {
         return user;

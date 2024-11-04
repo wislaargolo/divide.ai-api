@@ -2,9 +2,9 @@ package com.ufrn.imd.divide.ai.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 
-public record DebtRequestDTO(
-        @NotNull(message = "userId de dívida é obrigatório.")
-        Long userId,
+public record DebtUpdateRequestDTO(
+        @NotNull(message = "id de dívida é obrigatório.")
+        Long id,
         @NotNull(message = "amount de dívida é obrigatório.")
         Double amount
-) { }
+) {}

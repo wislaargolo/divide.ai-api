@@ -15,6 +15,7 @@ public record GroupTransactionCreateRequestDTO(
         String description,
         @NotNull(message = "createdByUserId é obrigatório.")
         Long createdByUserId,
+        @NotEmpty(message = "debts é obrigatório.")
         List<DebtRequestDTO> debts
 ) {
 }

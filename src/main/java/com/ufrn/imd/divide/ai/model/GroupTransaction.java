@@ -20,7 +20,7 @@ public class GroupTransaction extends Transaction {
     private List<Debt> debts;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false, updatable = false)
     private User createdBy;
 
     public Group getGroup() {
