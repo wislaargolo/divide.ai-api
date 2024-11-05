@@ -16,6 +16,10 @@ public class UserTransaction extends Transaction {
 
     private LocalDateTime paidAt;
 
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private Category category;
+
     public LocalDateTime getPaidAt() {
         return paidAt;
     }
@@ -30,5 +34,13 @@ public class UserTransaction extends Transaction {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 }

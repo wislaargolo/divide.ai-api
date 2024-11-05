@@ -15,12 +15,12 @@ public class GroupTransaction extends Transaction {
     @JoinColumn(name = "group_id", nullable = false)
     private Group group;
 
-    @OneToMany(mappedBy="groupTransaction")
+    @OneToMany(mappedBy="groupTransaction", cascade = CascadeType.REMOVE)
     @JsonManagedReference
     private List<Debt> debts;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false, updatable = false)
     private User createdBy;
 
     public Group getGroup() {

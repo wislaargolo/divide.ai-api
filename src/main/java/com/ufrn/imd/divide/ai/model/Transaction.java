@@ -13,10 +13,6 @@ public abstract class Transaction extends BaseEntity {
     @Column(nullable = false)
     private String description;
 
-    @ManyToOne
-    @JoinColumn(nullable = false)
-    private Category category;
-
     public Double getAmount() {
         return amount;
     }
@@ -32,13 +28,6 @@ public abstract class Transaction extends BaseEntity {
     public void setDescription(String description) {
         this.description = description;
     }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
+    
 
 }
