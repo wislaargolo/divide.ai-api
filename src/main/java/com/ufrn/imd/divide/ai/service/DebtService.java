@@ -4,6 +4,7 @@ import com.ufrn.imd.divide.ai.dto.request.DebtRequestDTO;
 import com.ufrn.imd.divide.ai.dto.request.DebtUpdateRequestDTO;
 import com.ufrn.imd.divide.ai.dto.request.GroupTransactionCreateRequestDTO;
 import com.ufrn.imd.divide.ai.dto.request.GroupTransactionUpdateRequestDTO;
+import com.ufrn.imd.divide.ai.dto.response.DebtResponseDTO;
 import com.ufrn.imd.divide.ai.exception.BusinessException;
 import com.ufrn.imd.divide.ai.exception.ResourceNotFoundException;
 import com.ufrn.imd.divide.ai.mapper.DebtMapper;
@@ -11,13 +12,17 @@ import com.ufrn.imd.divide.ai.model.Debt;
 import com.ufrn.imd.divide.ai.model.GroupTransaction;
 import com.ufrn.imd.divide.ai.model.User;
 import com.ufrn.imd.divide.ai.repository.DebtRepository;
+import com.ufrn.imd.divide.ai.repository.GroupTransactionRepository;
 import com.ufrn.imd.divide.ai.service.interfaces.IDebtService;
 import com.ufrn.imd.divide.ai.service.interfaces.IUserService;
 import com.ufrn.imd.divide.ai.util.AttributeUtils;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,15 +31,20 @@ import java.util.stream.Collectors;
 public class DebtService implements IDebtService {
 
     private final DebtRepository debtRepository;
+    private final GroupTransactionRepository groupTransactionRepository;
     private final IUserService userService;
     private final DebtMapper debtMapper;
-
+    private final UserValidationService userValidationService;
     public DebtService(DebtRepository debtRepository,
                        IUserService userService,
-                       DebtMapper debtMapper) {
+                       DebtMapper debtMapper,
+                       GroupTransactionRepository groupTransactionRepository,
+                       UserValidationService userValidationService) {
         this.debtRepository = debtRepository;
         this.userService = userService;
         this.debtMapper = debtMapper;
+        this.groupTransactionRepository = groupTransactionRepository;
+        this.userValidationService = userValidationService;
     }
 
     public List<Debt> saveDebts(GroupTransactionCreateRequestDTO dto, GroupTransaction savedGroupTransaction) {
@@ -80,5 +90,37 @@ public class DebtService implements IDebtService {
     }
 
 
+    public List<DebtResponseDTO> getDebtsByGroupId(Long groupTransactionId) {
+        if (!groupTransactionRepository.existsById(groupTransactionId)) {
+            throw new BusinessException(
+                    "Transação de grupo com ID " + groupTransactionId + " não encontrado.",
+                    HttpStatus.NOT_FOUND
+            );
+        }
 
+        return debtRepository.findByGroupTransaction_IdAndActiveTrue(groupTransactionId)
+                .stream()
+                .map(debtMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public DebtResponseDTO updatePaidAt(Long debtId, LocalDateTime paidAt) {
+
+
+        Debt debt = debtRepository.findById(debtId)
+                .orElseThrow(() -> new EntityNotFoundException("Débito com ID " + debtId + " não encontrado."));
+
+        userValidationService.validateUser(debt.getGroupTransaction().getCreatedBy().getId(),"Apenas o dono da transação do grupo pode setar se a despesa está paga ou não.");
+
+        debt.setPaidAt(paidAt);
+        return debtMapper.toDTO(debtRepository.save(debt));
+    }
+
+    public List<DebtResponseDTO> getDebtHistoryByGroupTransaction(Long groupTransactionId) {
+        return debtRepository.findByGroupTransactionIdOrderByPaidAtDescThenCreatedAtDesc(groupTransactionId)
+                .stream()
+                .map(debtMapper::toDTO)
+                .collect(Collectors.toList());
+    }
 }
