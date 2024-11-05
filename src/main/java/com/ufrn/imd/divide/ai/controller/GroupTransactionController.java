@@ -64,7 +64,7 @@ public class GroupTransactionController {
                 groupTransactionService.update(id, dto),
                 null);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/{groupId}/{transactionId}")
