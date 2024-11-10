@@ -56,7 +56,7 @@ public class GroupTransactionService implements IGroupTransactionService {
         GroupTransaction groupTransaction = groupTransactionMapper.toEntity(dto);
 
         Group group = groupService.findByIdIfExists(dto.groupId());
-        User createdBy = userService.findById(dto.createdByUserId());
+        User createdBy = userService.findById(dto.createdBy());
         groupTransaction.setGroup(group);
         groupTransaction.setCreatedBy(createdBy);
 
@@ -69,7 +69,7 @@ public class GroupTransactionService implements IGroupTransactionService {
     }
 
     private void validateBeforeSave(GroupTransactionCreateRequestDTO dto) {
-        userValidationService.validateUser(dto.createdByUserId());
+        userValidationService.validateUser(dto.createdBy());
 
         Double totalDebts = dto.debts().stream()
                 .mapToDouble(DebtRequestDTO::amount)
