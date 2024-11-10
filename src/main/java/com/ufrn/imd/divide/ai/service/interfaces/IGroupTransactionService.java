@@ -13,6 +13,8 @@ public interface IGroupTransactionService {
     GroupTransactionResponseDTO update(Long id, GroupTransactionUpdateRequestDTO dto);
 
     List<GroupTransactionResponseDTO> findAll(Long groupId);
+
+    GroupTransactionResponseDTO findById(Long transactionId);
     
     String delete(Long groupId, Long transactionId);
 }
