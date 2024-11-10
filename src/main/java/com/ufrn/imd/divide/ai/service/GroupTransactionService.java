@@ -153,6 +153,12 @@ public class GroupTransactionService implements IGroupTransactionService {
         }
     }
 
+    @Override
+    public GroupTransactionResponseDTO findById(Long transactionId) {
+        GroupTransaction groupTransaction = findByIdIfExists(transactionId);
+        return groupTransactionMapper.toDTO(groupTransaction);
+    }
+
     private GroupTransaction findByIdIfExists(Long id) {
         return groupTransactionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(
                 "Despesa de grupo com id " + id + " não encontrado."));

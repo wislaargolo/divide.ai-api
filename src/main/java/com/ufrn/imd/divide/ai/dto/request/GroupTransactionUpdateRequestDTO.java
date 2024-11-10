@@ -7,9 +7,7 @@ import java.util.List;
 
 public record GroupTransactionUpdateRequestDTO(
         Double amount,
-        Long groupId,
         String description,
-
         @NotEmpty(message = "debts é obrigatório")
         @Valid
         List<DebtUpdateRequestDTO> debts

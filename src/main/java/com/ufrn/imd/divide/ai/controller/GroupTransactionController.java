@@ -42,7 +42,7 @@ public class GroupTransactionController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/{groupId}")
+    @GetMapping("/group/{groupId}")
     public ResponseEntity<ApiResponseDTO<List<GroupTransactionResponseDTO>>> findAllByGroupId(@PathVariable Long groupId) {
         ApiResponseDTO<List<GroupTransactionResponseDTO>> response = new ApiResponseDTO<>(
                 true,
@@ -52,6 +52,18 @@ public class GroupTransactionController {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponseDTO<GroupTransactionResponseDTO>> findById(@PathVariable Long id) {
+        ApiResponseDTO<GroupTransactionResponseDTO> response = new ApiResponseDTO<>(
+                true,
+                "Despesa recuperada com sucesso.",
+                groupTransactionService.findById(id),
+                null);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponseDTO<GroupTransactionResponseDTO>> update(
