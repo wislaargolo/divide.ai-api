@@ -20,8 +20,10 @@ public interface IDebtService {
 
     List<DebtResponseDTO> getDebtsByGroupId(Long groupTransactionId);
 
-    @Transactional
+
     DebtResponseDTO updatePaidAt(Long debtId, LocalDateTime paidAt);
 
     List<DebtResponseDTO> getDebtHistoryByGroupTransaction(Long groupTransactionId);
+
+
 }

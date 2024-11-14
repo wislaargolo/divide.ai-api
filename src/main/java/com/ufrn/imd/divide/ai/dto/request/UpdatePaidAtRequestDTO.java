@@ -1,4 +1,5 @@
 package com.ufrn.imd.divide.ai.dto.request;
 
-public class UpdatePaidAtRequestDTO {
-}
+import java.time.LocalDateTime;
+
+public record UpdatePaidAtRequestDTO(LocalDateTime paidAt) {}
