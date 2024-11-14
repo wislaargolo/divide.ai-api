@@ -34,11 +34,16 @@ public class CategoryService implements ICategoryService {
 
     @Override
     public CategoryResponseDTO saveCategory(CategoryRequestDTO category) {
-        List<Category> existingCategory = categoryRepository.findByName(category.name());
+        List<Category> existingCategory = categoryRepository.findByNameIgnoreCaseAndUserIdAndExpense(
+                category.name(),
+                category.userId(),
+                category.expense()
+        );
 
         if (!existingCategory.isEmpty()) {
             throw new BusinessException(
-                    "Categoria com o nome '" + category.name() + "' já existe.", HttpStatus.BAD_REQUEST
+                    "Categoria com o nome '" + category.name() + "' e tipo de despesa '" + (category.expense() ? "saída" : "entrada") + "' já existe para este usuário.",
+                    HttpStatus.BAD_REQUEST
             );
         }
         User user = userRepository.findById(category.userId())

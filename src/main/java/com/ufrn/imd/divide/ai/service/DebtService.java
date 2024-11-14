@@ -90,6 +90,7 @@ public class DebtService implements IDebtService {
     }
 
 
+
     public List<DebtResponseDTO> getDebtsByGroupId(Long groupTransactionId) {
         if (!groupTransactionRepository.existsById(groupTransactionId)) {
             throw new BusinessException(
@@ -104,7 +105,7 @@ public class DebtService implements IDebtService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
+
     public DebtResponseDTO updatePaidAt(Long debtId, LocalDateTime paidAt) {
 
 

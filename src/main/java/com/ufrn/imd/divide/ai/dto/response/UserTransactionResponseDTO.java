@@ -14,6 +14,5 @@ public record UserTransactionResponseDTO(
         LocalDateTime paidAt,
         LocalDateTime createdAt
 
-
 ) {
 }

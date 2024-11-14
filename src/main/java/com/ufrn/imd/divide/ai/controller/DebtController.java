@@ -1,5 +1,6 @@
 package com.ufrn.imd.divide.ai.controller;
 
+import com.ufrn.imd.divide.ai.dto.request.UpdatePaidAtRequestDTO;
 import com.ufrn.imd.divide.ai.dto.response.ApiResponseDTO;
 import com.ufrn.imd.divide.ai.dto.response.DebtResponseDTO;
 import com.ufrn.imd.divide.ai.service.interfaces.IDebtService;
@@ -19,6 +20,7 @@ public class DebtController {
         this.debtService = debtService;
     }
 
+
     @GetMapping("/details/{groupId}")
     public ResponseEntity<ApiResponseDTO<List<DebtResponseDTO>>> getDebtsByGroupId(@PathVariable Long groupId) {
         ApiResponseDTO<List<DebtResponseDTO>> response = new ApiResponseDTO<>(
@@ -33,18 +35,17 @@ public class DebtController {
     @PutMapping("/{debtId}/paid-at")
     public ResponseEntity<ApiResponseDTO<DebtResponseDTO>> updatePaidAt(
             @PathVariable Long debtId,
-            @RequestParam LocalDateTime paidAt) {
+            @RequestBody UpdatePaidAtRequestDTO request) {
 
         ApiResponseDTO<DebtResponseDTO> response = new ApiResponseDTO<>(
                 true,
                 "Campo pago atualizado com sucesso.",
-                debtService.updatePaidAt(debtId, paidAt),
+                debtService.updatePaidAt(debtId, request.paidAt()),
                 null
         );
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
-
     @GetMapping("/history/{groupTransactionId}")
     public ResponseEntity<ApiResponseDTO<List<DebtResponseDTO>>> getDebtHistoryByGroupTransaction(@PathVariable Long groupTransactionId) {
 
