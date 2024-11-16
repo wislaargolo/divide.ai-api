@@ -2,14 +2,16 @@ package com.ufrn.imd.divide.ai.service;
 
 import com.ufrn.imd.divide.ai.dto.request.UserTransactionCreateRequestDTO;
 import com.ufrn.imd.divide.ai.dto.request.UserTransactionUpdateRequestDTO;
+import com.ufrn.imd.divide.ai.dto.response.UserTransactionByMonthResponseDTO;
 import com.ufrn.imd.divide.ai.dto.response.UserTransactionResponseDTO;
 import com.ufrn.imd.divide.ai.exception.ResourceNotFoundException;
+import com.ufrn.imd.divide.ai.mapper.UserTransactionByMonthMapper;
 import com.ufrn.imd.divide.ai.mapper.UserTransactionMapper;
 import com.ufrn.imd.divide.ai.model.Category;
 import com.ufrn.imd.divide.ai.model.User;
 import com.ufrn.imd.divide.ai.model.UserTransaction;
-import com.ufrn.imd.divide.ai.repository.CategoryRepository;
 import com.ufrn.imd.divide.ai.repository.UserTransactionRepository;
+import com.ufrn.imd.divide.ai.repository.VWUserTransactionsGroupedByMonthRepository;
 import com.ufrn.imd.divide.ai.service.interfaces.ICategoryService;
 import com.ufrn.imd.divide.ai.service.interfaces.IUserService;
 import com.ufrn.imd.divide.ai.service.interfaces.IUserTransactionService;
@@ -25,17 +27,21 @@ import java.util.stream.Collectors;
 public class UserTransactionService implements IUserTransactionService {
 
     private final UserTransactionRepository userTransactionRepository;
+    private final VWUserTransactionsGroupedByMonthRepository vwUserTransactionsGroupedByMonthRepository;
+    private final UserTransactionByMonthMapper userTransactionByMonthMapper;
     private final UserTransactionMapper userTransactionMapper;
     private final IUserService userService;
     private final ICategoryService categoryService;
     private final IUserValidationService userValidationService;
 
     public UserTransactionService(UserTransactionRepository userTransactionRepository,
-                                  UserTransactionMapper userTransactionMapper,
+                                  VWUserTransactionsGroupedByMonthRepository vwUserTransactionsGroupedByMonthRepository, UserTransactionByMonthMapper userTransactionByMonthMapper, UserTransactionMapper userTransactionMapper,
                                   IUserService userService,
                                   ICategoryService categoryService,
                                   IUserValidationService userValidationService) {
         this.userTransactionRepository = userTransactionRepository;
+        this.vwUserTransactionsGroupedByMonthRepository = vwUserTransactionsGroupedByMonthRepository;
+        this.userTransactionByMonthMapper = userTransactionByMonthMapper;
         this.userTransactionMapper = userTransactionMapper;
         this.userService = userService;
         this.categoryService = categoryService;
@@ -52,12 +58,13 @@ public class UserTransactionService implements IUserTransactionService {
         UserTransaction userTransaction = userTransactionMapper.toEntity(dto);
         userTransaction.setUser(user);
         userTransaction.setCategory(category);
-        if (category.getExpense()){
+        if (category.getExpense()) {
             userTransaction.setAmount(-dto.amount());
         }
 
         return userTransactionMapper.toDto(userTransactionRepository.save(userTransaction));
     }
+
     @Override
     public List<UserTransactionResponseDTO> findAllByUserId(Long userId) {
         userValidationService.validateUser(userId);
@@ -83,7 +90,7 @@ public class UserTransactionService implements IUserTransactionService {
         }
 
         BeanUtils.copyProperties(dto, userTransaction, AttributeUtils.getNullOrBlankPropertyNames(dto));
-        if (category.getExpense()){
+        if (category.getExpense()) {
             userTransaction.setAmount(-dto.amount());
         }
         return userTransactionMapper.toDto(userTransactionRepository.save(userTransaction));
@@ -101,6 +108,14 @@ public class UserTransactionService implements IUserTransactionService {
     @Override
     public UserTransactionResponseDTO findById(Long userId) {
         return userTransactionMapper.toDto(findByIdIfExists(userId));
+    }
+
+    @Override
+    public List<UserTransactionByMonthResponseDTO> getUserTransactionsGroupedByMonth(Long userId) {
+        return vwUserTransactionsGroupedByMonthRepository.findByUserId(userId)
+                .stream()
+                .map(userTransactionByMonthMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override

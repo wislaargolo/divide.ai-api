@@ -3,6 +3,7 @@ package com.ufrn.imd.divide.ai.controller;
 import com.ufrn.imd.divide.ai.dto.request.UserTransactionCreateRequestDTO;
 import com.ufrn.imd.divide.ai.dto.request.UserTransactionUpdateRequestDTO;
 import com.ufrn.imd.divide.ai.dto.response.ApiResponseDTO;
+import com.ufrn.imd.divide.ai.dto.response.UserTransactionByMonthResponseDTO;
 import com.ufrn.imd.divide.ai.dto.response.UserTransactionResponseDTO;
 import com.ufrn.imd.divide.ai.service.interfaces.IUserTransactionService;
 import jakarta.validation.Valid;
@@ -72,6 +73,18 @@ public class UserTransactionController {
                 true,
                 "Transações recuperadas com sucesso.",
                 userTransactionService.findAllByUserId(userId),
+                null
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/transactions/grouped-by-month/{userId}")
+    public ResponseEntity<ApiResponseDTO<List<UserTransactionByMonthResponseDTO>>> getTransactionsGroupedByMonth(@PathVariable Long userId) {
+        ApiResponseDTO<List<UserTransactionByMonthResponseDTO>> response = new ApiResponseDTO<>(
+                true,
+                "Transações por mês recuperadas com sucesso.",
+                userTransactionService.getUserTransactionsGroupedByMonth(userId),
                 null
         );
 
