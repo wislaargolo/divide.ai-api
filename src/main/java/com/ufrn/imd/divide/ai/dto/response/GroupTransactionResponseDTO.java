@@ -11,7 +11,6 @@ public record GroupTransactionResponseDTO(
         GroupResponseDTO group,
         UserResponseDTO createdBy,
         List<DebtResponseDTO> debts,
-
         LocalDate dueDate
 ) {
 }

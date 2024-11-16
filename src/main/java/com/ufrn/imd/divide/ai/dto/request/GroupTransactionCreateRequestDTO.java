@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,8 +19,7 @@ public record GroupTransactionCreateRequestDTO(
         Long createdBy,
         @NotEmpty(message = "debts é obrigatório.")
         List<DebtRequestDTO> debts,
-
         @NotNull(message = "data de vencimento é obrigatório.")
-        LocalDateTime dueDate
+        LocalDate dueDate
 ) {
 }
