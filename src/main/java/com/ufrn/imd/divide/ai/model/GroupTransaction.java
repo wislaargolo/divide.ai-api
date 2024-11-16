@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Where;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -22,6 +23,8 @@ public class GroupTransaction extends Transaction {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false, updatable = false)
     private User createdBy;
+
+    private LocalDate dueDate;
 
     public Group getGroup() {
         return group;
@@ -45,5 +48,13 @@ public class GroupTransaction extends Transaction {
 
     public void setCreatedBy(User createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public LocalDate getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(LocalDate dueDate) {
+        this.dueDate = dueDate;
     }
 }
