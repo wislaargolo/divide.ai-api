@@ -91,6 +91,10 @@ public class OpenAIservice implements IOpenAIService {
         String chatResponse = chatCompletionResponse.getChoices().get(0).getMessage().getContent();
         String chatId = chatCompletionResponse.getId();
 
+        logger.info("chatResponse: " + chatResponse);
+
+        OpenAIResponseDTO responseDTO = parseChatResponseToJSON(chatResponse);
+
         Chat chat = chatMapper.toEntity(chatRequestDTO);
         chat.setUser(user);
         chat.setResponse(chatResponse);
@@ -98,7 +102,7 @@ public class OpenAIservice implements IOpenAIService {
 
         openAIRepository.save(chat);
 
-        return chatMapper.toDto(chat);
+        return responseDTO;
     }
 
     private List<ChatRequestMessage> buildChatMessages(String prompt) throws Exception {
@@ -135,7 +139,7 @@ public class OpenAIservice implements IOpenAIService {
             return String.format("Lista de transações: \n%s", userTransactionsJson);
         } catch (Exception e) {
             e.printStackTrace();
-            return "Erro ao construir a lista de transações.";
+            throw new BusinessException("Erro ao construir a lista de transações.", HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -152,16 +156,32 @@ public class OpenAIservice implements IOpenAIService {
             return String.format("Lista de categorias: \n%s", categoriesJson);
         } catch (Exception e) {
             e.printStackTrace();
-            return "Erro ao construir a lista de categorias.";
+            throw new BusinessException("Erro ao construir a lista de categorias.", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private OpenAIResponseDTO parseChatResponseToJSON(String chatResponse) {
+        String cleanedResponse = chatResponse.replaceAll("```json|```", "").trim();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        try {
+            return objectMapper.readValue(cleanedResponse, OpenAIResponseDTO.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BusinessException("Erro ao parsear resposta da LLM para JSON.", HttpStatus.BAD_REQUEST);
         }
     }
 
     @Override
     public OpenAIResponseDTO getLastChat(Long userId) {
-        Chat lastChat = openAIRepository.findLatestChatByUserId(userId);
+        Chat lastChat = openAIRepository.findTopByUserIdOrderByCreatedAtDesc(userId);
 
         if (lastChat == null) return null;
 
-        return chatMapper.toDto(lastChat);
+        OpenAIResponseDTO lastChatResponse = parseChatResponseToJSON(lastChat.getResponse());
+
+        return lastChatResponse;
     }
+
 }

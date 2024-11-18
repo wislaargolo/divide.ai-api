@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "chats")
-@Where(clause = "active = true")
 public class Chat {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -30,7 +30,7 @@ public class OpenAIController {
         return ResponseEntity.ok(response);
     }
     @GetMapping("/user/{userId}")
-    public ResponseEntity<ApiResponseDTO<OpenAIResponseDTO>> chatCompletion(@Valid @RequestParam Long userId) throws Exception {
+    public ResponseEntity<ApiResponseDTO<OpenAIResponseDTO>> chatCompletion(@PathVariable Long userId) throws Exception {
         OpenAIResponseDTO chat = openAIService.getLastChat(userId);
 
         ApiResponseDTO<OpenAIResponseDTO> response = new ApiResponseDTO<>(
