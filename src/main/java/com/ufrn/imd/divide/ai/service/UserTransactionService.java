@@ -54,7 +54,6 @@ public class UserTransactionService implements IUserTransactionService {
         User user = userService.findById(dto.userId());
         Category category = categoryService.getCategoryByIdIfExists(dto.categoryId());
 
-
         UserTransaction userTransaction = userTransactionMapper.toEntity(dto);
         userTransaction.setUser(user);
         userTransaction.setCategory(category);
@@ -83,7 +82,7 @@ public class UserTransactionService implements IUserTransactionService {
         UserTransaction userTransaction = findByIdIfExists(transactionId);
         Category category = categoryService.getCategoryByIdIfExists(dto.categoryId());
         userTransaction.setCategory(category);
-        userValidationService.validateUser(userTransaction.getUser().getId(), "Apenas o dono da transação pode atualizá-la.");
+        userValidationService.validateUser(userTransaction.getUser().getId());
 
         if (dto.paidAt() == null) {
             userTransaction.setPaidAt(null);
@@ -100,7 +99,7 @@ public class UserTransactionService implements IUserTransactionService {
     @Override
     public void delete(Long transactionId) {
         UserTransaction userTransaction = findByIdIfExists(transactionId);
-        userValidationService.validateUser(userTransaction.getUser().getId(), "Apenas o dono da transação pode removê-la.");
+        userValidationService.validateUser(userTransaction.getUser().getId());
         userTransaction.setActive(false);
         userTransactionRepository.save(userTransaction);
     }

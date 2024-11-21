@@ -9,10 +9,7 @@ public record DebtResponseDTO(
         Long id,
         Double amount,
         UserResponseDTO user,
-
-        @JsonInclude(JsonInclude.Include.NON_NULL)
         Date createdAt,
-        @JsonInclude(JsonInclude.Include.NON_NULL)
         Date paidAt
 ) {
 }

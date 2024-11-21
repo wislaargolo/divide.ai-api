@@ -1,11 +1,11 @@
 package com.ufrn.imd.divide.ai.model;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "categories")
-@Where(clause = "active = true")
+@SQLRestriction("active = true")
 public class Category extends BaseEntity {
 
     @Column(nullable = false)

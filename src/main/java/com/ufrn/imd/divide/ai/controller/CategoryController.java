@@ -80,6 +80,20 @@ public class CategoryController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponseDTO<CategoryResponseDTO>> getById(
+            @PathVariable Long id) {
+
+        ApiResponseDTO<CategoryResponseDTO> response = new ApiResponseDTO<>(
+                true,
+                "Categoria recuperada com sucesso.",
+                categoryService.getCategoryById(id),
+                null
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponseDTO<CategoryResponseDTO>> updateCategory(
             @PathVariable Long id,

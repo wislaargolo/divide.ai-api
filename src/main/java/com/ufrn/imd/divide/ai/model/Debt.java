@@ -2,13 +2,14 @@ package com.ufrn.imd.divide.ai.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "debts")
-@Where(clause = "active = true")
+@SQLRestriction("active = true")
 public class Debt extends BaseEntity {
 
     @ManyToOne
