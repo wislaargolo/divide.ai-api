@@ -11,6 +11,6 @@ import org.mapstruct.Mapping;
 public interface ChatMapper {
     Chat toEntity(OpenAIResponseDTO openAIResponseDTO);
     Chat toEntity(OpenAIRequestDTO openAIRequestDTO);
-    @Mapping(source = "user.id", target = "userId")
+    //    @Mapping(source = "user.id", target = "userId")
     OpenAIResponseDTO toDto(Chat chat);
 }
