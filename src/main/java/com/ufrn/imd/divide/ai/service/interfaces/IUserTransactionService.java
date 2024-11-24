@@ -2,6 +2,7 @@ package com.ufrn.imd.divide.ai.service.interfaces;
 
 import com.ufrn.imd.divide.ai.dto.request.UserTransactionCreateRequestDTO;
 import com.ufrn.imd.divide.ai.dto.request.UserTransactionUpdateRequestDTO;
+import com.ufrn.imd.divide.ai.dto.response.UserTransactionByCategoryDTO;
 import com.ufrn.imd.divide.ai.dto.response.UserTransactionByMonthResponseDTO;
 import com.ufrn.imd.divide.ai.dto.response.UserTransactionResponseDTO;
 import com.ufrn.imd.divide.ai.model.UserTransaction;
@@ -18,6 +19,7 @@ public interface IUserTransactionService {
     UserTransactionResponseDTO findById(Long userId);
 
     List<UserTransactionByMonthResponseDTO> getUserTransactionsGroupedByMonth(Long userId);
+    List<UserTransactionByCategoryDTO> getUserTransactionsGroupedByCategory(Long userId);
 
     UserTransaction findByIdIfExists(Long id);
 

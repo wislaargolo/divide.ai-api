@@ -2,15 +2,18 @@ package com.ufrn.imd.divide.ai.service;
 
 import com.ufrn.imd.divide.ai.dto.request.UserTransactionCreateRequestDTO;
 import com.ufrn.imd.divide.ai.dto.request.UserTransactionUpdateRequestDTO;
+import com.ufrn.imd.divide.ai.dto.response.UserTransactionByCategoryDTO;
 import com.ufrn.imd.divide.ai.dto.response.UserTransactionByMonthResponseDTO;
 import com.ufrn.imd.divide.ai.dto.response.UserTransactionResponseDTO;
 import com.ufrn.imd.divide.ai.exception.ResourceNotFoundException;
+import com.ufrn.imd.divide.ai.mapper.UserTransactionByCategoryMapper;
 import com.ufrn.imd.divide.ai.mapper.UserTransactionByMonthMapper;
 import com.ufrn.imd.divide.ai.mapper.UserTransactionMapper;
 import com.ufrn.imd.divide.ai.model.Category;
 import com.ufrn.imd.divide.ai.model.User;
 import com.ufrn.imd.divide.ai.model.UserTransaction;
 import com.ufrn.imd.divide.ai.repository.UserTransactionRepository;
+import com.ufrn.imd.divide.ai.repository.VWUserTransactionByCategoryRepository;
 import com.ufrn.imd.divide.ai.repository.VWUserTransactionsGroupedByMonthRepository;
 import com.ufrn.imd.divide.ai.service.interfaces.ICategoryService;
 import com.ufrn.imd.divide.ai.service.interfaces.IUserService;
@@ -28,20 +31,24 @@ public class UserTransactionService implements IUserTransactionService {
 
     private final UserTransactionRepository userTransactionRepository;
     private final VWUserTransactionsGroupedByMonthRepository vwUserTransactionsGroupedByMonthRepository;
+    private final VWUserTransactionByCategoryRepository vwUserTransactionByCategoryRepository;
     private final UserTransactionByMonthMapper userTransactionByMonthMapper;
+    private final UserTransactionByCategoryMapper userTransactionByCategoryMapper;
     private final UserTransactionMapper userTransactionMapper;
     private final IUserService userService;
     private final ICategoryService categoryService;
     private final IUserValidationService userValidationService;
 
     public UserTransactionService(UserTransactionRepository userTransactionRepository,
-                                  VWUserTransactionsGroupedByMonthRepository vwUserTransactionsGroupedByMonthRepository, UserTransactionByMonthMapper userTransactionByMonthMapper, UserTransactionMapper userTransactionMapper,
+                                  VWUserTransactionsGroupedByMonthRepository vwUserTransactionsGroupedByMonthRepository, VWUserTransactionByCategoryRepository vwUserTransactionByCategoryRepository, UserTransactionByMonthMapper userTransactionByMonthMapper, UserTransactionByCategoryMapper userTransactionByCategoryMapper, UserTransactionMapper userTransactionMapper,
                                   IUserService userService,
                                   ICategoryService categoryService,
                                   IUserValidationService userValidationService) {
         this.userTransactionRepository = userTransactionRepository;
         this.vwUserTransactionsGroupedByMonthRepository = vwUserTransactionsGroupedByMonthRepository;
+        this.vwUserTransactionByCategoryRepository = vwUserTransactionByCategoryRepository;
         this.userTransactionByMonthMapper = userTransactionByMonthMapper;
+        this.userTransactionByCategoryMapper = userTransactionByCategoryMapper;
         this.userTransactionMapper = userTransactionMapper;
         this.userService = userService;
         this.categoryService = categoryService;
@@ -95,7 +102,6 @@ public class UserTransactionService implements IUserTransactionService {
         return userTransactionMapper.toDto(userTransactionRepository.save(userTransaction));
     }
 
-
     @Override
     public void delete(Long transactionId) {
         UserTransaction userTransaction = findByIdIfExists(transactionId);
@@ -114,6 +120,14 @@ public class UserTransactionService implements IUserTransactionService {
         return vwUserTransactionsGroupedByMonthRepository.findByUserId(userId)
                 .stream()
                 .map(userTransactionByMonthMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserTransactionByCategoryDTO> getUserTransactionsGroupedByCategory(Long userId) {
+        return vwUserTransactionByCategoryRepository.findByUserId(userId)
+                .stream()
+                .map(userTransactionByCategoryMapper::toDto)
                 .collect(Collectors.toList());
     }
 
