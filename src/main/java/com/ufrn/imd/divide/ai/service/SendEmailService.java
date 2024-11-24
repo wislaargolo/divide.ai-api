@@ -38,48 +38,50 @@ public class SendEmailService implements ISendEmailService {
 
         // Buscar pagamentos com vencimento em 3 dias
         List<GroupTransaction> payments3Days = groupTransactionRepository.findByDueDate(today.plusDays(2));
-        System.out.println("Pagamentos encontrados: " + payments3Days.size());
+        System.out.println("Pagamentos encontrados 3 dias: " + payments3Days.size());
 
         payments3Days.forEach(payment -> {
             String formattedAmount = currencyFormat.format(payment.getAmount());
             String formattedDate = payment.getDueDate().format(dateFormatter);
             List<Debt> debts = debtRepository.findByGroupTransaction_IdAndActiveTrue(payment.getId());
-                    long daysLeft = ChronoUnit.DAYS.between(today, payment.getDueDate());
-                    debts.forEach(debt -> {
-                        Map<String, String> placeholders = new HashMap<>();
-                        placeholders.put("amount", formattedAmount);
-                        placeholders.put("user", String.valueOf(debt.getUser().getFirstName()));
-                        placeholders.put("dueDate", formattedDate);
-                        placeholders.put("days", String.valueOf(daysLeft));
+            long daysLeft = ChronoUnit.DAYS.between(today, payment.getDueDate());
+            debts.forEach(debt -> {
+                Map<String, String> placeholders = new HashMap<>();
+                placeholders.put("amount", formattedAmount);
+                placeholders.put("user", String.valueOf(debt.getUser().getFirstName()));
+                placeholders.put("dueDate", formattedDate);
+                placeholders.put("days", String.valueOf(daysLeft)+" dias");
 
-                        // Carregar o HTML do template e substituir os placeholders
-                        String htmlContent = htmlTemplateService.loadHtmlTemplate("TemplateEmail.html", placeholders);
+                // Carregar o HTML do template e substituir os placeholders
+                String htmlContent = htmlTemplateService.loadHtmlTemplate("TemplateEmail.html", placeholders);
 
-                        // Enviar o e-mail
-                        if(debt.getPaidAt() == null){
-                            emailService.sendEmail(
-                                    debt.getUser().getEmail(),
-                                    "Lembrete de pagamento - Vencimento em 3 dias",
-                                    htmlContent
-                            );
-                        }
+                // Enviar o e-mail
+                if(debt.getPaidAt() == null){
+                    emailService.sendEmail(
+                            debt.getUser().getEmail(),
+                            "Lembrete de pagamento - Vencimento em 3 dias",
+                            htmlContent
+                    );
+                }
 
-                    });
+            });
         });
 
         //Buscar pagamentos com vencimento em 1 dia
         List<GroupTransaction> payments1Day = groupTransactionRepository.findByDueDate(today.plusDays(1));
-
+        System.out.println("Pagamentos encontrados 1 dia: " + payments1Day.size());
         payments1Day.forEach(payment -> {
+            String formattedAmount = currencyFormat.format(payment.getAmount());
+            String formattedDate = payment.getDueDate().format(dateFormatter);
             List<Debt> debts = debtRepository.findByGroupTransaction_IdAndActiveTrue(payment.getId());
             debts.forEach( debt -> {
                 long daysLeft = ChronoUnit.DAYS.between(today, payment.getDueDate());
 
                 Map<String, String> placeholders = new HashMap<>();
-                placeholders.put("amount", String.valueOf(payment.getAmount()));
+                placeholders.put("amount", formattedAmount);
                 placeholders.put("user", String.valueOf(debt.getUser().getFirstName()));
-                placeholders.put("dueDate", payment.getDueDate().toString());
-                placeholders.put("days", String.valueOf(daysLeft));
+                placeholders.put("dueDate", formattedDate);
+                placeholders.put("days", String.valueOf(daysLeft)+" dia");
 
                 // Carregar o HTML do template e substituir os placeholders
                 String htmlContent = htmlTemplateService.loadHtmlTemplate("TemplateEmail.html", placeholders);
