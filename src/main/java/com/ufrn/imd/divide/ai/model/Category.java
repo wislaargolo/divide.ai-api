@@ -5,7 +5,6 @@ import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "categories")
-@SQLRestriction("active = true")
 public class Category extends BaseEntity {
 
     @Column(nullable = false)

@@ -53,8 +53,7 @@ public class GroupService implements IGroupService {
     public void delete(Long groupId) {
         Group group = findByIdIfExists(groupId);
         userValidationService.validateUser(group.getCreatedBy().getId());
-        group.setActive(false);
-        groupRepository.save(group);
+        groupRepository.delete(group);
     }
 
     @Override

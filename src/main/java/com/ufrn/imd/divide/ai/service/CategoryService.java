@@ -138,7 +138,6 @@ public class CategoryService implements ICategoryService {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada."));
 
-        category.setActive(false);
-        categoryRepository.save(category);
+        categoryRepository.delete(category);
     }
 }

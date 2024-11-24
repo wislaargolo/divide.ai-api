@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "user_transactions")
-@SQLRestriction("active = true")
 public class UserTransaction extends Transaction {
 
     @ManyToOne(fetch = FetchType.LAZY)

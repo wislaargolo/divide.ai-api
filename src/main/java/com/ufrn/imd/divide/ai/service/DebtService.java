@@ -88,7 +88,7 @@ public class DebtService implements IDebtService {
             );
         }
 
-        return debtRepository.findByGroupTransaction_IdAndActiveTrue(groupTransactionId)
+        return debtRepository.findByGroupTransaction_Id(groupTransactionId)
                 .stream()
                 .map(debtMapper::toDTO)
                 .collect(Collectors.toList());

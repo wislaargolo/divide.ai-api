@@ -23,6 +23,8 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String phoneNumber;
 
+    private boolean active = true;
+
     public User() {}
 
     public User(Long id) {
@@ -69,4 +71,11 @@ public class User extends BaseEntity {
         this.password = password;
     }
 
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 }

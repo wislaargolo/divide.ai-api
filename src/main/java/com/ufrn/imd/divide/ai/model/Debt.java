@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "debts")
-@SQLRestriction("active = true")
 public class Debt extends BaseEntity {
 
     @ManyToOne

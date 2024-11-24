@@ -8,7 +8,6 @@ import java.util.List;
 
 @Entity
 @Table(name = "group_transactions")
-@SQLRestriction("active = true")
 public class GroupTransaction extends Transaction {
 
     @ManyToOne(fetch = FetchType.LAZY)
