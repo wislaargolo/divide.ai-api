@@ -25,6 +25,7 @@ Responda seguindo a estrutura JSON abaixo:
     "nextExpensesByCategory": [
         {
             "categoryId": [ID da Categoria (type int)],
+            "categoryName": ["Nome da Categoria" (type string)],
             "amount": [Predição do gasto nessa categoria para o próximo mês (type double)]
         }
     ],
