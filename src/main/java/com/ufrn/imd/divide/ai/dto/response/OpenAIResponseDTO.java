@@ -24,5 +24,6 @@ public record OpenAIResponseDTO(
     //    ) {
     //    }
 
-    public record NextExpensesByCategory(int categoryId, String categoryName, Double amount) { }
+    public record NextExpensesByCategory(int categoryId, String categoryName,
+                                         String categoryColor, Double amount) { }
 }
