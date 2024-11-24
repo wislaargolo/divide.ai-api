@@ -2,14 +2,13 @@ package com.ufrn.imd.divide.ai.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import org.hibernate.annotations.Where;
-
+import org.hibernate.annotations.SQLRestriction;
 import java.time.LocalDate;
 import java.util.List;
 
 @Entity
 @Table(name = "group_transactions")
-@Where(clause = "active = true")
+@SQLRestriction("active = true")
 public class GroupTransaction extends Transaction {
 
     @ManyToOne(fetch = FetchType.LAZY)

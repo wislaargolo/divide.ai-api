@@ -2,8 +2,6 @@ package com.ufrn.imd.divide.ai.service;
 
 import com.ufrn.imd.divide.ai.dto.request.DebtRequestDTO;
 import com.ufrn.imd.divide.ai.dto.request.DebtUpdateRequestDTO;
-import com.ufrn.imd.divide.ai.dto.request.GroupTransactionCreateRequestDTO;
-import com.ufrn.imd.divide.ai.dto.request.GroupTransactionUpdateRequestDTO;
 import com.ufrn.imd.divide.ai.dto.response.DebtResponseDTO;
 import com.ufrn.imd.divide.ai.exception.BusinessException;
 import com.ufrn.imd.divide.ai.exception.ResourceNotFoundException;
@@ -17,7 +15,6 @@ import com.ufrn.imd.divide.ai.service.interfaces.IDebtService;
 import com.ufrn.imd.divide.ai.service.interfaces.IUserService;
 import com.ufrn.imd.divide.ai.util.AttributeUtils;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -47,9 +44,10 @@ public class DebtService implements IDebtService {
         this.userValidationService = userValidationService;
     }
 
-    public List<Debt> saveDebts(GroupTransactionCreateRequestDTO dto, GroupTransaction savedGroupTransaction) {
+    @Override
+    public List<Debt> saveDebts(List<DebtRequestDTO> debtRequestDTOs, GroupTransaction savedGroupTransaction) {
         List<Debt> debts = new ArrayList<>();
-        for (DebtRequestDTO debtDTO : dto.debts()) {
+        for (DebtRequestDTO debtDTO : debtRequestDTOs) {
             Debt debt = debtMapper.toEntity(debtDTO);
 
             User user = userService.findById(debtDTO.userId());
@@ -61,24 +59,15 @@ public class DebtService implements IDebtService {
     }
 
     @Override
-    public List<Debt> updateDebts(GroupTransactionUpdateRequestDTO dto) {
+    public List<Debt> updateDebts(List<DebtUpdateRequestDTO> debtRequestDTOS) {
         List<Debt> debts = new ArrayList<>();
-        for (DebtUpdateRequestDTO debtDTO : dto.debts()) {
+        for (DebtUpdateRequestDTO debtDTO : debtRequestDTOS) {
             Debt debt = findById(debtDTO.id());
             validateBeforeUpdate(debt, debtDTO.amount());
             BeanUtils.copyProperties(debtDTO, debt, AttributeUtils.getNullOrBlankPropertyNames(debtDTO));
             debts.add(debt);
         }
         return debtRepository.saveAll(debts);
-    }
-
-    private void validateBeforeUpdate(Debt debt, Double dtoAmount) {
-        if(!debt.getAmount().equals(dtoAmount) && debt.getPaidAt() != null) {
-            throw new BusinessException(
-                   "Não é possível alterar o valor de uma dívida paga",
-                   HttpStatus.BAD_REQUEST
-            );
-        }
     }
 
     @Override
@@ -107,8 +96,6 @@ public class DebtService implements IDebtService {
 
 
     public DebtResponseDTO updatePaidAt(Long debtId, LocalDateTime paidAt) {
-
-
         Debt debt = debtRepository.findById(debtId)
                 .orElseThrow(() -> new EntityNotFoundException("Débito com ID " + debtId + " não encontrado."));
 
@@ -123,5 +110,14 @@ public class DebtService implements IDebtService {
                 .stream()
                 .map(debtMapper::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    private void validateBeforeUpdate(Debt debt, Double dtoAmount) {
+        if(!debt.getAmount().equals(dtoAmount) && debt.getPaidAt() != null) {
+            throw new BusinessException(
+                    "Não é possível alterar o valor de uma dívida paga",
+                    HttpStatus.BAD_REQUEST
+            );
+        }
     }
 }

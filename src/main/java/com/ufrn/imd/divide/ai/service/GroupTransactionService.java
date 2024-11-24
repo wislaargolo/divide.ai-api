@@ -1,6 +1,5 @@
 package com.ufrn.imd.divide.ai.service;
 
-import com.ufrn.imd.divide.ai.dto.request.DebtRequestDTO;
 import com.ufrn.imd.divide.ai.dto.request.DebtUpdateRequestDTO;
 import com.ufrn.imd.divide.ai.dto.request.GroupTransactionCreateRequestDTO;
 import com.ufrn.imd.divide.ai.dto.request.GroupTransactionUpdateRequestDTO;
@@ -50,8 +49,8 @@ public class GroupTransactionService implements IGroupTransactionService {
     }
 
     @Transactional
+    @Override
     public GroupTransactionResponseDTO save(GroupTransactionCreateRequestDTO dto) {
-        validateBeforeSave(dto);
 
         GroupTransaction groupTransaction = groupTransactionMapper.toEntity(dto);
 
@@ -60,35 +59,38 @@ public class GroupTransactionService implements IGroupTransactionService {
         groupTransaction.setGroup(group);
         groupTransaction.setCreatedBy(createdBy);
 
+        validateBeforeSave(groupTransaction);
+
         GroupTransaction savedGroupTransaction = groupTransactionRepository.save(groupTransaction);
 
-        List<Debt> debts = debtService.saveDebts(dto, savedGroupTransaction);
+        List<Debt> debts = debtService.saveDebts(dto.debts(), savedGroupTransaction);
         savedGroupTransaction.setDebts(debts);
 
         return groupTransactionMapper.toDTO(savedGroupTransaction);
     }
 
-    private void validateBeforeSave(GroupTransactionCreateRequestDTO dto) {
-        userValidationService.validateUser(dto.createdBy());
+    private void validateBeforeSave(GroupTransaction groupTransaction) {
+        userValidationService.validateUser(groupTransaction.getCreatedBy().getId());
+        validateGroupDescontinued(groupTransaction);
 
-        Double totalDebts = dto.debts().stream()
-                .mapToDouble(DebtRequestDTO::amount)
+        Double totalDebts = groupTransaction.getDebts().stream()
+                .mapToDouble(Debt::getAmount)
                 .sum();
 
-        validateTotalDebts(totalDebts, dto.amount());
+        validateTotalDebts(totalDebts, groupTransaction.getAmount());
     }
 
     @Transactional
+    @Override
     public GroupTransactionResponseDTO update(Long transactionId, GroupTransactionUpdateRequestDTO dto) {
         GroupTransaction groupTransaction = findByIdIfExists(transactionId);
-
         BeanUtils.copyProperties(dto, groupTransaction, AttributeUtils.getNullOrBlankPropertyNames(dto));
 
         validateBeforeUpdate(dto, groupTransaction);
 
         GroupTransaction updatedGroupTransaction = groupTransactionRepository.save(groupTransaction);
 
-        List<Debt> debts = debtService.updateDebts(dto);
+        List<Debt> debts = debtService.updateDebts(dto.debts());
         updatedGroupTransaction.setDebts(debts);
 
         return groupTransactionMapper.toDTO(updatedGroupTransaction);
@@ -96,6 +98,7 @@ public class GroupTransactionService implements IGroupTransactionService {
     }
 
     @Transactional
+    @Override
     public List<GroupTransactionResponseDTO> findAll(Long groupId) {
         Group group = groupService.findByIdIfExists(groupId);
         List<GroupTransaction> groupTransactions = groupTransactionRepository.findByGroupId(group.getId());
@@ -105,6 +108,7 @@ public class GroupTransactionService implements IGroupTransactionService {
     }
 
     @Transactional
+    @Override
     public String delete(Long groupId, Long transactionId) {
         Group group = groupService.findByIdIfExists(groupId);
         GroupTransaction groupTransaction = findByIdIfExists(transactionId);
@@ -118,12 +122,22 @@ public class GroupTransactionService implements IGroupTransactionService {
         return "Despesa de grupo com id " + transactionId + " deletada com sucesso.";
     }
 
+    @Override
+    public GroupTransactionResponseDTO findById(Long transactionId) {
+        GroupTransaction groupTransaction = findByIdIfExists(transactionId);
+        return groupTransactionMapper.toDTO(groupTransaction);
+    }
+
+    private GroupTransaction findByIdIfExists(Long id) {
+        return groupTransactionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(
+                "Despesa de grupo com id " + id + " não encontrado."));
+    }
+
     private void validateBeforeUpdate(GroupTransactionUpdateRequestDTO dto,
             GroupTransaction groupTransaction) {
-        userValidationService.validateUser(
-                groupTransaction.getCreatedBy().getId(),
-                "Apenas o dono da despesa em grupo pode remover um membro.");
 
+        userValidationService.validateUser(groupTransaction.getCreatedBy().getId());
+        validateGroupDescontinued(groupTransaction);
         validateDebtsList(groupTransaction.getDebts(), dto.debts());
 
         Double totalDebts = dto.debts().stream()
@@ -131,6 +145,14 @@ public class GroupTransactionService implements IGroupTransactionService {
                 .sum();
 
         validateTotalDebts(totalDebts, groupTransaction.getAmount());
+    }
+
+    private void validateGroupDescontinued(GroupTransaction groupTransaction) {
+        if(groupTransaction.getGroup().isDiscontinued()) {
+            throw new BusinessException(
+                    "Não é possível gerenciar despesas um grupo descontinuado.",
+                    HttpStatus.BAD_REQUEST);
+        }
     }
 
     private void validateTotalDebts(Double totalDebts, Double dto) {
@@ -153,14 +175,4 @@ public class GroupTransactionService implements IGroupTransactionService {
         }
     }
 
-    @Override
-    public GroupTransactionResponseDTO findById(Long transactionId) {
-        GroupTransaction groupTransaction = findByIdIfExists(transactionId);
-        return groupTransactionMapper.toDTO(groupTransaction);
-    }
-
-    private GroupTransaction findByIdIfExists(Long id) {
-        return groupTransactionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(
-                "Despesa de grupo com id " + id + " não encontrado."));
-    }
 }

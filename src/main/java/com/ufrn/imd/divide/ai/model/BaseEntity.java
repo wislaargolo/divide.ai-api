@@ -17,7 +17,6 @@ public abstract class BaseEntity implements Serializable {
 
     private boolean active = true;
 
-    // to em duvida sobre isso
     @Column(nullable = false, updatable = false)
     protected LocalDateTime createdAt;
 

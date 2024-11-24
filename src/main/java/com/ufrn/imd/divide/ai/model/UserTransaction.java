@@ -1,13 +1,13 @@
 package com.ufrn.imd.divide.ai.model;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "user_transactions")
-@Where(clause = "active = true")
+@SQLRestriction("active = true")
 public class UserTransaction extends Transaction {
 
     @ManyToOne(fetch = FetchType.LAZY)
