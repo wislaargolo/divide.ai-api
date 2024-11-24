@@ -76,7 +76,7 @@ public class OpenAIservice implements IOpenAIService {
 
         String prompt = objectivePrompt + "\n" + transactionPrompt + "\n" + categoriesTransactionPrompt;
 
-        logger.info("Prompt: " + prompt);
+        // logger.info("Prompt: " + prompt);
 
         List<ChatRequestMessage> chatMessages = buildChatMessages(prompt);
 
@@ -91,7 +91,7 @@ public class OpenAIservice implements IOpenAIService {
         String chatResponse = chatCompletionResponse.getChoices().get(0).getMessage().getContent();
         String chatId = chatCompletionResponse.getId();
 
-        logger.info("chatResponse: " + chatResponse);
+        // logger.info("chatResponse: " + chatResponse);
 
         OpenAIResponseDTO responseDTO = parseChatResponseToJSON(chatResponse);
 
