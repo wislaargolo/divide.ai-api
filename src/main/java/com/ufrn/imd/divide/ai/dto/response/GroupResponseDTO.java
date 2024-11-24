@@ -13,7 +13,6 @@ public record GroupResponseDTO(
         String code,
         List<UserResponseDTO> members,
         UserResponseDTO createdBy,
-        boolean discontinued,
-        Date createdAt
+        boolean discontinued
 ) {
 }
