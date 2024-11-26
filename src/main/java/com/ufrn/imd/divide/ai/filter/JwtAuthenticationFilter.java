@@ -24,16 +24,16 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final IJwtService IJwtService;
+    private final IJwtService jwtService;
     private final UserDetailsService userDetailsService;
     private final HandlerExceptionResolver handlerExceptionResolver;
     private final EndpointChecker endpointChecker;
 
-    public JwtAuthenticationFilter(IJwtService IJwtService,
+    public JwtAuthenticationFilter(IJwtService jwtService,
                                    UserDetailsService userDetailsService,
                                    HandlerExceptionResolver handlerExceptionResolver,
                                    EndpointChecker endpointChecker) {
-        this.IJwtService = IJwtService;
+        this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
         this.handlerExceptionResolver = handlerExceptionResolver;
         this.endpointChecker = endpointChecker;
@@ -66,13 +66,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
 
-            String username = IJwtService.extractUsername(token);
+            String username = jwtService.extractUsername(token);
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                if (IJwtService.isValid(token, userDetails)) {
+                if (jwtService.isValid(token, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities()
                     );
