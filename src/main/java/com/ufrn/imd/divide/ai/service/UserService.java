@@ -26,25 +26,25 @@ public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
-    private final IUserValidationService IUserValidationService;
+    private final IUserValidationService userValidationService;
     private final IGroupService groupService;
 
     public UserService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
                        UserMapper userMapper,
-                       IUserValidationService IUserValidationService,
+                       IUserValidationService userValidationService,
                        IGroupService groupService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
-        this.IUserValidationService = IUserValidationService;
+        this.userValidationService = userValidationService;
         this.groupService = groupService;
     }
 
     @Transactional
     @Override
     public void delete(Long userId) {
-        IUserValidationService.validateUser(userId);
+        userValidationService.validateUser(userId);
         User user = findById(userId);
 
         groupService.validateAndUpdateGroupsForUserDeletion(user);
@@ -80,7 +80,7 @@ public class UserService implements IUserService {
     }
 
     private void validateBeforeUpdate(User entity) {
-        IUserValidationService.validateUser(entity.getId());
+        userValidationService.validateUser(entity.getId());
         validateBeforeSave(entity);
     }
 
