@@ -133,8 +133,7 @@ public class GroupTransactionService implements IGroupTransactionService {
                 "Despesa de grupo com id " + id + " não encontrado."));
     }
 
-    private void validateBeforeUpdate(GroupTransactionUpdateRequestDTO dto,
-            GroupTransaction groupTransaction) {
+    private void validateBeforeUpdate(GroupTransactionUpdateRequestDTO dto, GroupTransaction groupTransaction) {
 
         userValidationService.validateUser(
                 groupTransaction.getCreatedBy().getId(),
