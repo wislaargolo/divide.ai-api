@@ -106,8 +106,7 @@ public class UserTransactionService implements IUserTransactionService {
     public void delete(Long transactionId) {
         UserTransaction userTransaction = findByIdIfExists(transactionId);
         userValidationService.validateUser(userTransaction.getUser().getId());
-        userTransaction.setActive(false);
-        userTransactionRepository.save(userTransaction);
+        userTransactionRepository.delete(userTransaction);
     }
 
     @Override

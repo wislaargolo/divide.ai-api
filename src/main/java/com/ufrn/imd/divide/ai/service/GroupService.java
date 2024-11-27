@@ -52,9 +52,9 @@ public class GroupService implements IGroupService {
     @Override
     public void delete(Long groupId) {
         Group group = findByIdIfExists(groupId);
-        userValidationService.validateUser(group.getCreatedBy().getId());
-        group.setActive(false);
-        groupRepository.save(group);
+        userValidationService.validateUser(group.getCreatedBy().getId(),
+                "Apenas o dono do grupo pode removê-lo.");
+        groupRepository.delete(group);
     }
 
     @Override
@@ -181,10 +181,11 @@ public class GroupService implements IGroupService {
     }
 
     private void validateBeforeDelete(Group group, User user) {
-        userValidationService.validateUser(group.getCreatedBy().getId());
+        userValidationService.validateUser(
+                group.getCreatedBy().getId(),
+                "Apenas o dono do grupo pode remover um membro.");
 
         validateUserRemoval(group, user);
-
     }
 
     private void validateBeforeLeave(Group group, User user) {

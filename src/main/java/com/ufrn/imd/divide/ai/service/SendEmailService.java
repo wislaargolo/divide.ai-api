@@ -43,7 +43,7 @@ public class SendEmailService implements ISendEmailService {
         payments3Days.forEach(payment -> {
             String formattedAmount = currencyFormat.format(payment.getAmount());
             String formattedDate = payment.getDueDate().format(dateFormatter);
-            List<Debt> debts = debtRepository.findByGroupTransaction_IdAndActiveTrue(payment.getId());
+            List<Debt> debts = debtRepository.findByGroupTransaction_Id(payment.getId());
             long daysLeft = ChronoUnit.DAYS.between(today, payment.getDueDate());
             debts.forEach(debt -> {
                 Map<String, String> placeholders = new HashMap<>();
@@ -73,7 +73,7 @@ public class SendEmailService implements ISendEmailService {
         payments1Day.forEach(payment -> {
             String formattedAmount = currencyFormat.format(payment.getAmount());
             String formattedDate = payment.getDueDate().format(dateFormatter);
-            List<Debt> debts = debtRepository.findByGroupTransaction_IdAndActiveTrue(payment.getId());
+            List<Debt> debts = debtRepository.findByGroupTransaction_Id(payment.getId());
             debts.forEach( debt -> {
                 long daysLeft = ChronoUnit.DAYS.between(today, payment.getDueDate());
 

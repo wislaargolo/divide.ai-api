@@ -7,7 +7,6 @@ import java.util.List;
 
 @Entity
 @Table(name = "groups")
-@SQLRestriction("active = true")
 public class Group extends BaseEntity {
 
     @Column(nullable = false)

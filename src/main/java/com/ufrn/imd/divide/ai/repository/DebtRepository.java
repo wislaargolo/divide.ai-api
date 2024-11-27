@@ -15,7 +15,7 @@ public interface DebtRepository extends JpaRepository<Debt, Long> {
 
     boolean existsByUserAndGroupTransactionGroupAndPaidAtIsNull(User user, Group group);
 
-    List<Debt> findByGroupTransaction_IdAndActiveTrue(Long groupTransactionId);
+    List<Debt> findByGroupTransaction_Id(Long groupTransactionId);
 
     @Query("SELECT d FROM Debt d WHERE d.groupTransaction.id = :groupTransactionId " +
             "ORDER BY CASE WHEN d.paidAt IS NOT NULL THEN 0 ELSE 1 END, d.paidAt DESC, d.createdAt DESC")
