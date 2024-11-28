@@ -24,9 +24,7 @@ public class CategoryController {
     @PostMapping
     public ResponseEntity<ApiResponseDTO<CategoryResponseDTO>> createCategory(
             @Valid @RequestBody CategoryRequestDTO categoryDTO) {
-        System.out.println("antes do service" + categoryDTO);
         CategoryResponseDTO newCategory = categoryService.saveCategory(categoryDTO);
-        System.out.println("depois do service" + newCategory);
         ApiResponseDTO<CategoryResponseDTO> response = new ApiResponseDTO<>(
                 true,
                 "Categoria criada com sucesso.",
@@ -57,7 +55,7 @@ public class CategoryController {
 
         ApiResponseDTO<List<CategoryResponseDTO>> response = new ApiResponseDTO<>(
                 true,
-                "Categories retrieved successfully for user with ID: " + userId,
+                "Categorias recuperadas com sucesso para usuário com ID: " + userId,
                 categories,
                 null
         );
@@ -108,16 +106,6 @@ public class CategoryController {
                  null
          );
          return ResponseEntity.ok(response);
-
-//                .orElseGet(() -> {
-//                    ApiResponseDTO<CategoryDTO> response = new ApiResponseDTO<>(
-//                            false,
-//                            "Error: Category not found.",
-//                            null,
-//                            null
-//                    );
-//                    return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-//                });
     }
 
     @DeleteMapping("/{id}")

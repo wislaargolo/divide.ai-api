@@ -38,7 +38,6 @@ public class SendEmailService implements ISendEmailService {
 
         // Buscar pagamentos com vencimento em 3 dias
         List<GroupTransaction> payments3Days = groupTransactionRepository.findByDueDate(today.plusDays(2));
-        System.out.println("Pagamentos encontrados 3 dias: " + payments3Days.size());
 
         payments3Days.forEach(payment -> {
             String formattedAmount = currencyFormat.format(payment.getAmount());
@@ -69,7 +68,6 @@ public class SendEmailService implements ISendEmailService {
 
         //Buscar pagamentos com vencimento em 1 dia
         List<GroupTransaction> payments1Day = groupTransactionRepository.findByDueDate(today.plusDays(1));
-        System.out.println("Pagamentos encontrados 1 dia: " + payments1Day.size());
         payments1Day.forEach(payment -> {
             String formattedAmount = currencyFormat.format(payment.getAmount());
             String formattedDate = payment.getDueDate().format(dateFormatter);
