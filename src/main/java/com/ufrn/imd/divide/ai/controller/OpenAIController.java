@@ -23,7 +23,7 @@ public class OpenAIController {
 
         ApiResponseDTO<OpenAIResponseDTO> response = new ApiResponseDTO<>(
                 true,
-                "Chat completed successfully.",
+                "Bate-papo concluído com sucesso.",
                 chat,
                 null
         );
@@ -35,7 +35,7 @@ public class OpenAIController {
 
         ApiResponseDTO<OpenAIResponseDTO> response = new ApiResponseDTO<>(
                 true,
-                "Chat retrieved successfully.",
+                "Bate-papo recuperado com sucesso.",
                 chat,
                 null
         );
